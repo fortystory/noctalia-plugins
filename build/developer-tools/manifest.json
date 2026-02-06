@@ -1,0 +1,31 @@
+{
+  "id": "dev.fortystory.developer-tools",
+  "name": "Developer Tools",
+  "version": "1.0.0",
+  "type": "bar-widget",
+  "author": "Forty",
+  "description": "Collection of developer utilities including timestamp converter and JSON formatter",
+  "main": "qml/main.qml",
+  "icon": "icon.svg",
+  "translations": {
+    "en_US": "translations/en_US.qm",
+    "zh_CN": "translations/zh_CN.qm"
+  },
+  "settings": {
+    "window": {
+      "width": 600,
+      "height": 400,
+      "rememberPosition": true,
+      "rememberSize": true
+    },
+    "sidebar": {
+      "width": 80,
+      "rememberSelection": true
+    }
+  },
+  "permissions": [
+    "clipboard",
+    "system-time",
+    "theme-access"
+  ]
+}
