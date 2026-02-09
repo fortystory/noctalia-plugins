@@ -1,82 +1,63 @@
 // BarWidget.qml - 状态栏按钮组件 (Noctalia bar-widget 入口)
 import QtQuick
 import Quickshell
+import qs.Commons
 import qs.Widgets
 
-Item {
-    id: barWidget
+Rectangle {
+    id: root
 
     // Noctalia bar-widget 必需属性
     required property var pluginApi
-    required property var screen
-    property string widgetId: "developer-tools"
-    property string section: "center"  // left, center, right
+    required property ShellScreen screen
 
     // 尺寸属性
-    implicitWidth: 40
-    implicitHeight: 40
+    property real baseSize: Style.capsuleHeight
+    property bool applyUiScale: false
 
-    // 公共属性
-    property string buttonIcon: "🛠️"
-    property string tooltip: qsTr("Developer Tools")
-    property bool windowVisible: false
+    // 颜色属性
+    property color colorBg: Color.mSurfaceVariant
+    property color colorFg: Color.mPrimary
+    property color colorBgHover: Color.mHover
+    property color colorFgHover: Color.mOnHover
+    property bool hovering: false
 
-    // 当前显示的颜色
-    property color displayColor: windowVisible ? Style.color.primary :
-        (mouseArea.pressed ? Qt.darker(Style.color.primary, 1.2) :
-            (mouseArea.containsMouse ? Qt.lighter(Style.color.primary, 1.2) : Style.color.primary))
+    // 尺寸计算
+    implicitWidth: applyUiScale ? Math.round(baseSize * Style.uiScaleRatio) : Math.round(baseSize)
+    implicitHeight: applyUiScale ? Math.round(baseSize * Style.uiScaleRatio) : Math.round(baseSize)
 
-    // 主按钮
-    Rectangle {
-        id: buttonBackground
-        anchors.fill: parent
-        radius: 4
-        color: displayColor
-    }
+    // 样式
+    color: hovering ? colorBgHover : colorBg
+    radius: Math.min(Style.radiusL, width / 2)
+    border.color: Color.mOutline
+    border.width: Style.borderS
 
-    // 图标文本
-    Text {
+    // 图标 - 使用 NIcon
+    NIcon {
         anchors.centerIn: parent
-        text: buttonIcon
-        font.pixelSize: 18
+        icon: "code"  // 使用内置图标
+        color: hovering ? colorFgHover : colorFg
+        scale: 0.6
     }
 
     // 鼠标交互区域
     MouseArea {
-        id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
 
+        onEntered: root.hovering = true
+        onExited: root.hovering = false
+
         onClicked: {
-            windowVisible = !windowVisible
-            togglePanel()
+            if (pluginApi) {
+                pluginApi.togglePanel(root.screen, root)
+            }
         }
     }
 
     // 颜色动画
-    Behavior on displayColor {
+    Behavior on color {
         ColorAnimation { duration: 150 }
-    }
-
-    // ==================== 面板控制 ====================
-    function togglePanel() {
-        if (!pluginApi) {
-            console.warn("BarWidget: pluginApi not available")
-            return
-        }
-        pluginApi.togglePanel(barWidget.screen, barWidget)
-    }
-
-    function openPanel() {
-        if (!pluginApi) {
-            console.warn("BarWidget: pluginApi not available")
-            return
-        }
-        pluginApi.openPanel(barWidget.screen, barWidget)
-    }
-
-    function closePanel() {
-        windowVisible = false
     }
 }
