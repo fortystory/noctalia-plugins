@@ -4,7 +4,9 @@
 
 ## 项目概述
 
-Noctalia Shell 开发者工具插件项目。这是一个基于 QML/Qt Quick 的 Noctalia Shell 插件，提供开发者常用工具集合，包括时间戳转换和 JSON 格式化功能。
+Noctalia Shell 插件项目，包含多个插件：
+- **developer-tools**: 开发者工具集合（时间戳转换、JSON 格式化）
+- **query-tracker**: Shell 命令执行结果监控器
 
 ## 常用开发命令
 
@@ -12,7 +14,6 @@ Noctalia Shell 开发者工具插件项目。这是一个基于 QML/Qt Quick 的
 - **构建插件**: `./tools/build.sh` - 将插件复制到构建目录
 - **部署插件**: `./tools/deploy.sh` - 安装插件到用户目录
 - **验证 QML 语法**: `qmllint plugins/developer-tools/qml/**/*.qml`（如果安装了 qmllint）
-- **测试运行**: `qmlscene --quit plugins/developer-tools/qml/main.qml`（基本语法检查）
 
 ### 开发工作流
 1. 编辑 QML 文件
@@ -25,12 +26,15 @@ Noctalia Shell 开发者工具插件项目。这是一个基于 QML/Qt Quick 的
 ### 插件架构
 本项目使用 Noctalia Shell 插件架构：
 - **bar-widget 类型**: 在状态栏显示按钮，点击打开弹出窗口
+- **panel 类型**: 弹出式面板，显示详细信息
+- **settings 类型**: 设置界面，配置插件选项
 - **QML 界面**: 使用 Qt Quick 2.15 和 Qt Quick Controls 2.15
-- **模块化设计**: 工具组件化，便于扩展
 
 ### 项目结构
+
+#### developer-tools/
 ```
-plugins/developer-tools/
+developer-tools/
 ├── manifest.json          # 插件配置元数据
 ├── icon.svg              # 插件图标
 ├── README.md             # 插件说明
@@ -45,7 +49,7 @@ plugins/developer-tools/
 │   ├── ToolBase.qml      # 工具基类
 │   ├── TimestampTool.qml # 时间戳转换工具
 │   └── JsonFormatter.qml # JSON 格式化工具
-├── translations/         # 国际化翻译文件
+├── translations/         # 国际化翻译文件 (.ts)
 │   ├── en_US.ts
 │   └── zh_CN.ts
 └── tools/               # 构建和部署脚本
@@ -53,32 +57,79 @@ plugins/developer-tools/
     └── deploy.sh
 ```
 
+#### query-tracker/
+```
+query-tracker/
+├── manifest.json          # 插件配置元数据
+├── BarWidget.qml          # 状态栏组件（终端图标 + 失败计数徽章）
+├── Settings.qml           # 设置面板（命令管理 + 编辑/删除对话框）
+├── Panel.qml              # 结果面板（列表展示命令结果）
+├── README.md              # 插件说明
+└── i18n/                 # 国际化翻译文件 (.json)
+    ├── en.json
+    └── zh-CN.json
+```
+
 ## 开发注意事项
 
 ### 技术栈
 - **界面**: QML 2.15 + Qt Quick Controls 2.15
-- **主题系统**: 自定义 Theme.qml 组件管理颜色、尺寸、字体
-- **国际化**: Qt 翻译系统 (qsTr() 函数 + .ts/.qm 文件)
+- **主题系统**: Noctalia Style 组件（Color.m*、Style.*）
+- **国际化**: JSON 格式翻译文件
+  - 格式: `{ "key": "value" }`
+  - 使用: `pluginApi?.tr("key", "default")`
 - **Noctalia API**: `org.noctalia.shell 1.0` 模块集成
+
+### 翻译文件格式
+
+**推荐 JSON 格式（query-tracker 使用）**:
+```json
+{
+  "settings": {
+    "add": "Add",
+    "commandName": "Name"
+  },
+  "widget": {
+    "title": "Query Tracker",
+    "refresh": "Refresh"
+  }
+}
+```
+
+**使用方法**:
+```qml
+text: pluginApi?.tr("settings.add", "Add") || "Add"
+```
 
 ### 需要关注的配置文件
 - `manifest.json`: 插件元数据、权限、窗口设置
-- `.gitignore`: 通常包括构建目录、临时文件
-- `.claude/settings.local.json`: Claude Code 权限设置
+- `registry.json`: 插件注册表
+- `.gitignore`: 构建目录、临时文件
 
 ### 编码规范
 1. **组件化**: 每个功能独立组件，通过属性和信号通信
-2. **主题化**: 所有颜色、尺寸、字体从 Theme.qml 获取
-3. **国际化**: 所有用户可见字符串使用 qsTr() 包装
+2. **主题化**: 使用 `Color.m*` 和 `Style.*` 系统
+3. **国际化**: 所有用户可见字符串使用 `pluginApi?.tr()` 包装
 4. **错误处理**: 添加必要的边界检查和错误处理
 5. **性能**: 避免不必要的重新绑定，合理使用属性绑定
+6. **图标**: 使用 Nerd Fonts 图标库
+
+### 常见图标
+- `terminal` - 终端/命令
+- `settings` - 设置
+- `edit` - 编辑
+- `minus` - 删除
+- `check` - 成功
+- `close` - 失败/关闭
+- `refresh` - 刷新
+- `clock` - 时间
+- `code` - 代码
 
 ## 相关资源
 
 - **Noctalia Shell 文档**: [https://docs.noctalia.dev/](https://docs.noctalia.dev/) - Noctalia Shell 官方文档
 - **插件开发指南**: [https://docs.noctalia.dev/development/plugins/overview/](https://docs.noctalia.dev/development/plugins/overview/) - Noctalia 插件开发文档
 - **Qt QML 文档**: [https://doc.qt.io/qt-6/qmlapplications.html](https://doc.qt.io/qt-6/qmlapplications.html) - Qt QML 官方文档
-- **项目设计文档**: `docs/plans/` - 项目设计和实施计划文档
 
 ## 更新此文件
 

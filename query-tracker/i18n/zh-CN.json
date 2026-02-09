@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "add": "添加",
+    "addCommand": "添加新命令",
+    "cancel": "取消",
+    "clearResults": "清除结果",
+    "clearResultsDesc": "清除所有保存的命令结果",
+    "command": "命令",
+    "commandName": "名称",
+    "commands": "命令",
+    "delete": "删除",
+    "deleteConfirm": "确定删除此命令？",
+    "edit": "编辑",
+    "editCommand": "编辑命令",
+    "noCommands": "未配置命令。请在上方添加！",
+    "remove": "删除",
+    "save": "保存",
+    "seconds": "秒",
+    "updateInterval": "更新间隔",
+    "updateIntervalDesc": "执行命令的频率（秒）"
+  },
+  "widget": {
+    "exitCode": "退出码：%1",
+    "failed": "失败：%1",
+    "noResults": "暂无结果",
+    "refresh": "刷新",
+    "success": "成功：%1",
+    "title": "命令查询",
+    "totalCommands": "总计：%1"
+  }
+}

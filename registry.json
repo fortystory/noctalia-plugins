@@ -11,6 +11,17 @@
       "minNoctaliaVersion": "3.6.0",
       "license": "MIT",
       "lastUpdated": "2026-02-09T00:00:00+00:00"
+    },
+    {
+      "id": "query-tracker",
+      "name": "Query Tracker",
+      "version": "1.0.0",
+      "author": "forty",
+      "description": "Track and monitor shell command execution results",
+      "repository": "https://github.com/fortystory/noctalia-plugins",
+      "minNoctaliaVersion": "3.6.0",
+      "license": "MIT",
+      "lastUpdated": "2026-02-09T00:00:00+00:00"
     }
   ]
 }

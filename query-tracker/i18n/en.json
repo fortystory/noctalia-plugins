@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "add": "Add",
+    "addCommand": "Add New Command",
+    "cancel": "Cancel",
+    "clearResults": "Clear Results",
+    "clearResultsDesc": "Clear all saved command results",
+    "command": "Command",
+    "commandName": "Name",
+    "commands": "Commands",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this command?",
+    "edit": "Edit",
+    "editCommand": "Edit Command",
+    "noCommands": "No commands configured. Add one above!",
+    "remove": "Remove",
+    "save": "Save",
+    "seconds": "seconds",
+    "updateInterval": "Update Interval",
+    "updateIntervalDesc": "How often to execute commands (seconds)"
+  },
+  "widget": {
+    "exitCode": "Exit code: %1",
+    "failed": "Failed: %1",
+    "noResults": "No results",
+    "refresh": "Refresh",
+    "success": "Success: %1",
+    "title": "Query Tracker",
+    "totalCommands": "Total: %1"
+  }
+}
