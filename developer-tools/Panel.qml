@@ -1,8 +1,7 @@
 // Panel.qml - 开发者工具面板 (Noctalia Panel 入口)
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import org.noctalia.shell 1.0
+import QtQuick
+import Quickshell
+import qs.Widgets
 
 Item {
     id: root
@@ -11,11 +10,8 @@ Item {
     required property var pluginApi
     readonly property var geometryPlaceholder: panelContainer
     readonly property bool allowAttach: true
-    property real contentPreferredWidth: 680 * 1.0  // 可调整的宽度
-    property real contentPreferredHeight: 540 * 1.0  // 可调整的高度
-
-    // ==================== 主题引用 ====================
-    property var theme: Qt.createQmlObject('import QtQuick 2.15; QtObject {}', root, "ThemePlaceholder")
+    property real contentPreferredWidth: 680
+    property real contentPreferredHeight: 540
 
     // ==================== 当前工具组件 ====================
     property var currentTool: null
@@ -27,6 +23,7 @@ Item {
     Rectangle {
         id: panelContainer
         anchors.fill: parent
+        color: "transparent"  // 透明背景，点击关闭
 
         // 面板内容区域
         Rectangle {
@@ -35,19 +32,9 @@ Item {
             height: Math.min(parent.height - 40, root.contentPreferredHeight)
             anchors.centerIn: parent
             radius: 12
-            color: theme.backgroundColor
+            color: Style.color.surface
             border.width: 1
-            border.color: theme.borderColor
-
-            // 阴影效果
-            layer.enabled: true
-            layer.effect: DropShadow {
-                horizontalOffset: 0
-                verticalOffset: 4
-                radius: 16
-                samples: 17
-                color: "#00000030"
-            }
+            border.color: Style.color.outline
 
             // ==================== 标题栏 ====================
             Rectangle {
@@ -55,19 +42,15 @@ Item {
                 width: parent.width
                 height: 40
                 radius: parent.radius
-                color: Qt.lighter(theme.backgroundColor, 1.05)
+                color: Style.color.surfaceVariant
                 border.width: 1
-                border.color: theme.borderColor
+                border.color: Style.color.outline
 
                 // 拖拽区域
                 MouseArea {
                     anchors.fill: parent
                     drag.target: panelContent
                     drag.axis: Drag.XAndYAxis
-                    drag.minimumX: 0
-                    drag.maximumX: panelContainer.width - panelContent.width
-                    drag.minimumY: 0
-                    drag.maximumY: panelContainer.height - panelContent.height
                 }
 
                 // 标题
@@ -80,42 +63,20 @@ Item {
                     text: qsTr("开发者工具")
                     font.pixelSize: 14
                     font.bold: true
-                    color: theme.textColor
+                    color: Style.color.onSurface
                 }
 
                 // 关闭按钮
-                Button {
+                NButton {
                     id: closeButton
                     anchors {
                         right: parent.right
                         rightMargin: 10
                         verticalCenter: parent.verticalCenter
                     }
-                    width: 30
-                    height: 30
-
-                    background: Rectangle {
-                        radius: 4
-                        color: closeButton.down ? Qt.lighter(theme.errorColor, 1.2) :
-                               closeButton.hovered ? theme.errorColor : "transparent"
-                    }
-
-                    contentItem: Text {
-                        anchors.centerIn: parent
-                        text: "×"
-                        font.pixelSize: 20
-                        font.bold: true
-                        color: closeButton.hovered ? "white" : theme.textColor
-                    }
-
+                    text: "×"
                     onClicked: {
                         pluginApi.closePanel(pluginApi.panelOpenScreen)
-                    }
-
-                    ToolTip {
-                        visible: closeButton.hovered
-                        text: qsTr("关闭")
-                        delay: 300
                     }
                 }
             }
@@ -131,43 +92,147 @@ Item {
                 }
                 spacing: 10
 
-                // 侧边栏
-                Sidebar {
+                // 侧边栏 - 简化版本
+                Rectangle {
                     id: sidebar
                     width: 80
                     Layout.fillHeight: true
+                    color: Style.color.surfaceVariant
+                    radius: 8
 
-                    onToolSelected: function(index, toolName) {
-                        console.log("Loading tool:", toolName, "at index:", index)
-                        loadTool(index)
-                    }
-
-                    onSettingsButtonClicked: {
-                        if (settingsDialog) {
-                            settingsDialog.pluginApi = pluginApi
-                            settingsDialog.toolModel = sidebar.toolModel
-                            settingsDialog.showDialog()
+                    // 工具列表
+                    Column {
+                        anchors {
+                            fill: parent
+                            margins: 8
                         }
-                    }
-                }
+                        spacing: 8
 
-                // 工具加载器
-                Loader {
-                    id: toolLoader
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    sourceComponent: Component {
-                        Item {
-                            anchors.fill: parent
+                        // 时间戳工具按钮
+                        Rectangle {
+                            width: parent.width - 16
+                            height: 50
+                            radius: 8
+                            color: sidebarTool1.hovered ? Style.color.primaryContainer : Style.color.surface
+                            border.width: sidebarTool1.hovered ? 2 : 0
+                            border.color: Style.color.primary
 
                             Text {
                                 anchors.centerIn: parent
-                                text: qsTr("选择左侧工具开始使用")
-                                font.pixelSize: 16
-                                color: theme.textColor
-                                opacity: 0.5
+                                text: "🕐"
+                                font.pixelSize: 20
                             }
+
+                            MouseArea {
+                                id: sidebarTool1
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: loadTimestampTool()
+                            }
+                        }
+
+                        // JSON工具按钮
+                        Rectangle {
+                            width: parent.width - 16
+                            height: 50
+                            radius: 8
+                            color: sidebarTool2.hovered ? Style.color.primaryContainer : Style.color.surface
+                            border.width: sidebarTool2.hovered ? 2 : 0
+                            border.color: Style.color.primary
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "📄"
+                                font.pixelSize: 20
+                            }
+
+                            MouseArea {
+                                id: sidebarTool2
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: loadJsonTool()
+                            }
+                        }
+
+                        Item { Layout.fillHeight: true }
+                    }
+                }
+
+                // 工具内容区域
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: Style.color.surface
+                    radius: 8
+
+                    // 时间戳工具
+                    Column {
+                        id: timestampTool
+                        anchors {
+                            fill: parent
+                            margins: 20
+                        }
+                        visible: true
+                        spacing: 15
+
+                        Text {
+                            text: qsTr("时间戳转换")
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: Style.color.onSurface
+                        }
+
+                        Text {
+                            text: qsTr("当前时间戳（秒）:")
+                            color: Style.color.onSurfaceVariant
+                        }
+
+                        Text {
+                            id: currentTimestamp
+                            text: Math.floor(Date.now() / 1000).toString()
+                            font.pixelSize: 24
+                            font.bold: true
+                            color: Style.color.primary
+                        }
+
+                        Text {
+                            text: qsTr("当前时间戳（毫秒）:")
+                            color: Style.color.onSurfaceVariant
+                        }
+
+                        Text {
+                            text: Date.now().toString()
+                            font.pixelSize: 24
+                            font.bold: true
+                            color: Style.color.primary
+                        }
+
+                        Item { Layout.fillHeight: true }
+                    }
+
+                    // JSON 工具（默认隐藏）
+                    Rectangle {
+                        id: jsonTool
+                        anchors {
+                            fill: parent
+                            margins: 20
+                        }
+                        visible: false
+                        color: Style.color.surface
+
+                        Text {
+                            text: qsTr("JSON 格式化")
+                            font.pixelSize: 18
+                            font.bold: true
+                            color: Style.color.onSurface
+                        }
+
+                        Text {
+                            anchors.topMargin: 20
+                            text: qsTr("输入 JSON:")
+                            color: Style.color.onSurfaceVariant
                         }
                     }
                 }
@@ -183,185 +248,14 @@ Item {
         }
     }
 
-    // ==================== 消息显示组件 ====================
-    Rectangle {
-        id: messageBox
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: 50
-        }
-        width: 300
-        height: 40
-        radius: 6
-        color: theme.surfaceColor
-        border.width: 1
-        border.color: theme.borderColor
-        visible: false
-        z: 100
-
-        Text {
-            id: messageText
-            anchors.centerIn: parent
-            font.pixelSize: 12
-            color: theme.textColor
-        }
-
-        Timer {
-            id: messageTimer
-            interval: 3000
-            onTriggered: messageBox.visible = false
-        }
+    // ==================== 工具加载函数 ====================
+    function loadTimestampTool() {
+        timestampTool.visible = true
+        jsonTool.visible = false
     }
 
-    // ==================== 工具加载逻辑 ====================
-    function loadTool(index) {
-        // 清理当前工具
-        if (currentTool && typeof currentTool.cleanup === "function") {
-            currentTool.cleanup()
-        }
-
-        toolLoader.source = ""
-        currentTool = null
-
-        // 加载新工具
-        var toolInfo = sidebar.getCurrentTool()
-        if (toolInfo) {
-            var componentPath = "qml/tools/" + toolInfo.component
-            if (componentPath.indexOf("..") === -1 && componentPath.endsWith(".qml")) {
-                toolLoader.setSource(componentPath, {
-                    "toolName": toolInfo.name,
-                    "toolIcon": toolInfo.icon,
-                    "toolDescription": toolInfo.description
-                })
-
-                if (toolLoader.status === Loader.Ready) {
-                    currentTool = toolLoader.item
-                } else {
-                    var connection = function() {
-                        currentTool = toolLoader.item
-                        initializeAndConnectTool()
-                        toolLoader.loaded.disconnect(connection)
-                    }
-                    toolLoader.loaded.connect(connection)
-                    return
-                }
-            }
-        }
-
-        initializeAndConnectTool()
-    }
-
-    function initializeAndConnectTool() {
-        if (currentTool && typeof currentTool.initialize === "function") {
-            currentTool.initialize()
-        }
-
-        if (currentTool) {
-            if (typeof currentTool.copyToClipboard === "function") {
-                currentTool.copyToClipboard.connect(copyToClipboardHandler)
-            }
-            if (typeof currentTool.showMessage === "function") {
-                currentTool.showMessage.connect(showMessageHandler)
-            }
-        }
-    }
-
-    // ==================== 消息处理 ====================
-    function copyToClipboardHandler(text) {
-        if (pluginApi && typeof pluginApi.copyToClipboard === "function") {
-            pluginApi.copyToClipboard(text)
-            showMessage(qsTr("已复制到剪贴板"), "success")
-        } else {
-            showMessage(qsTr("复制功能需要Noctalia API支持"), "warning")
-        }
-    }
-
-    function showMessageHandler(message, type) {
-        showMessage(message, type)
-    }
-
-    function showMessage(text, type) {
-        switch(type) {
-            case "success":
-                messageBox.color = theme.successColor
-                messageText.color = "white"
-                break
-            case "warning":
-                messageBox.color = theme.warningColor
-                messageText.color = "white"
-                break
-            case "error":
-                messageBox.color = theme.errorColor
-                messageText.color = "white"
-                break
-            default:
-                messageBox.color = theme.surfaceColor
-                messageText.color = theme.textColor
-        }
-
-        messageText.text = text
-        messageBox.visible = true
-        messageTimer.restart()
-    }
-
-    // ==================== 设置对话框 ====================
-    function createSettingsDialog() {
-        try {
-            var dialogComponent = Qt.createComponent("qml/components/SettingsDialog.qml")
-
-            if (dialogComponent.status === Component.Ready) {
-                settingsDialog = dialogComponent.createObject(root, {
-                    "theme": theme,
-                    "pluginApi": pluginApi,
-                    "toolModel": sidebar.toolModel
-                })
-
-                if (settingsDialog) {
-                    console.log("Settings dialog created successfully")
-                }
-            }
-        } catch (error) {
-            console.error("Error creating settings dialog:", error)
-        }
-    }
-
-    // ==================== 主题初始化 ====================
-    function initTheme() {
-        theme = Qt.createQmlObject('import QtQuick 2.15; QtObject {}', root)
-
-        if (pluginApi && pluginApi.style) {
-            theme.backgroundColor = pluginApi.style.backgroundColor
-            theme.textColor = pluginApi.style.textColor
-            theme.borderColor = pluginApi.style.borderColor
-            theme.primaryColor = pluginApi.style.primaryColor
-            theme.successColor = pluginApi.style.successColor || "#10b981"
-            theme.warningColor = pluginApi.style.warningColor || "#f59e0b"
-            theme.errorColor = pluginApi.style.errorColor || "#ef4444"
-            theme.surfaceColor = pluginApi.style.surfaceColor || "#f8fafc"
-        }
-
-        // 监听主题变化
-        if (pluginApi) {
-            pluginApi.styleChanged.connect(function() {
-                if (pluginApi.style) {
-                    theme.backgroundColor = pluginApi.style.backgroundColor
-                    theme.textColor = pluginApi.style.textColor
-                    theme.borderColor = pluginApi.style.borderColor
-                    theme.primaryColor = pluginApi.style.primaryColor
-                    theme.successColor = pluginApi.style.successColor || "#10b981"
-                    theme.warningColor = pluginApi.style.warningColor || "#f59e0b"
-                    theme.errorColor = pluginApi.style.errorColor || "#ef4444"
-                    theme.surfaceColor = pluginApi.style.surfaceColor || "#f8fafc"
-                }
-            })
-        }
-    }
-
-    // ==================== 初始化 ====================
-    Component.onCompleted: {
-        console.log("Developer Tools Panel initialized")
-        initTheme()
-        createSettingsDialog()
+    function loadJsonTool() {
+        timestampTool.visible = false
+        jsonTool.visible = true
     }
 }
