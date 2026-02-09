@@ -54,13 +54,6 @@ Item {
         }
     }
 
-    // 工具提示
-    ToolTip {
-        visible: mouseArea.containsMouse && tooltip !== ""
-        delay: 500
-        text: tooltip
-    }
-
     // 颜色动画
     Behavior on displayColor {
         ColorAnimation { duration: 150 }
