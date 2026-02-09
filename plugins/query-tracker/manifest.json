@@ -1,0 +1,18 @@
+{
+    "id": "query-tracker",
+    "name": "Query Tracker",
+    "version": "1.0.0",
+    "description": "Track and display output from shell commands",
+    "author": "Noctalia User",
+    "entryPoints": {
+        "barWidget": "BarWidget.qml",
+        "panel": "Panel.qml",
+        "settings": "Settings.qml"
+    },
+    "metadata": {
+        "defaultSettings": {
+            "commands": [],
+            "updateInterval": 60
+        }
+    }
+}

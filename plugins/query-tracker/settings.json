@@ -1,0 +1,9 @@
+{
+    "commands": [
+        {
+            "name": "DeepSeek Balance",
+            "command": "curl -s https://api.deepseek.com/user/balance"
+        }
+    ],
+    "updateInterval": 60
+}
