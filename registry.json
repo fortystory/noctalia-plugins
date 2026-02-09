@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "plugins": [
+    {
+      "id": "developer-tools",
+      "name": "Developer Tools",
+      "version": "1.0.0",
+      "author": "forty",
+      "description": "Collection of developer utilities including timestamp converter and JSON formatter",
+      "repository": "https://github.com/fortystory/noctalia-plugins",
+      "minNoctaliaVersion": "3.6.0",
+      "license": "MIT",
+      "lastUpdated": "2026-02-09T00:00:00+00:00"
+    }
+  ]
+}
