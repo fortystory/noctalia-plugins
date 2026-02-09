@@ -416,4 +416,115 @@
         <translation>示例JSON已加载</translation>
     </message>
 </context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>外观</translation>
+    </message>
+    <message>
+        <source>Theme preference:</source>
+        <translation>主题偏好：</translation>
+    </message>
+    <message>
+        <source>Follow system</source>
+        <translation>跟随系统</translation>
+    </message>
+    <message>
+        <source>Light theme</source>
+        <translation>浅色主题</translation>
+    </message>
+    <message>
+        <source>Dark theme</source>
+        <translation>深色主题</translation>
+    </message>
+    <message>
+        <source>Theme changes will take effect after restarting the plugin</source>
+        <translation>主题更改将在下次启动插件时生效</translation>
+    </message>
+    <message>
+        <source>Select plugin theme appearance</source>
+        <translation>选择插件主题外观</translation>
+    </message>
+    <message>
+        <source>Startup settings</source>
+        <translation>启动设置</translation>
+    </message>
+    <message>
+        <source>Default startup tool:</source>
+        <translation>默认启动工具：</translation>
+    </message>
+    <message>
+        <source>Default tool will take effect after restarting the plugin</source>
+        <translation>默认工具将在下次启动插件时生效</translation>
+    </message>
+    <message>
+        <source>Select default tool when plugin starts</source>
+        <translation>选择插件启动时默认显示的工具</translation>
+    </message>
+    <message>
+        <source>Window behavior</source>
+        <translation>窗口行为</translation>
+    </message>
+    <message>
+        <source>Window position memory:</source>
+        <translation>窗口位置记忆：</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>启用</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>禁用</translation>
+    </message>
+    <message>
+        <source>Remember window position and size when closed</source>
+        <translation>记住窗口关闭时的位置和大小</translation>
+    </message>
+    <message>
+        <source>Disabling position memory will clear existing window position storage</source>
+        <translation>禁用位置记忆将清除现有的窗口位置存储</translation>
+    </message>
+    <message>
+        <source>Settings API unavailable, changes will not persist</source>
+        <translation>设置API不可用，更改不会持久保存</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>应用</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <source>Settings saved</source>
+        <translation>设置已保存</translation>
+    </message>
+    <message>
+        <source>Settings applied</source>
+        <translation>设置已应用</translation>
+    </message>
+    <message>
+        <source>Settings save failed</source>
+        <translation>设置保存失败</translation>
+    </message>
+    <message>
+        <source>Settings dialog initialization failed</source>
+        <translation>设置对话框初始化失败</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+</context>
 </TS>

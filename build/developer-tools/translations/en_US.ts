@@ -416,4 +416,115 @@
         <translation>Example JSON loaded</translation>
     </message>
 </context>
+<context>
+    <name>SettingsDialog</name>
+    <message>
+        <source>Settings</source>
+        <translation>Settings</translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation>Appearance</translation>
+    </message>
+    <message>
+        <source>Theme preference:</source>
+        <translation>Theme preference:</translation>
+    </message>
+    <message>
+        <source>Follow system</source>
+        <translation>Follow system</translation>
+    </message>
+    <message>
+        <source>Light theme</source>
+        <translation>Light theme</translation>
+    </message>
+    <message>
+        <source>Dark theme</source>
+        <translation>Dark theme</translation>
+    </message>
+    <message>
+        <source>Theme changes will take effect after restarting the plugin</source>
+        <translation>Theme changes will take effect after restarting the plugin</translation>
+    </message>
+    <message>
+        <source>Select plugin theme appearance</source>
+        <translation>Select plugin theme appearance</translation>
+    </message>
+    <message>
+        <source>Startup settings</source>
+        <translation>Startup settings</translation>
+    </message>
+    <message>
+        <source>Default startup tool:</source>
+        <translation>Default startup tool:</translation>
+    </message>
+    <message>
+        <source>Default tool will take effect after restarting the plugin</source>
+        <translation>Default tool will take effect after restarting the plugin</translation>
+    </message>
+    <message>
+        <source>Select default tool when plugin starts</source>
+        <translation>Select default tool when plugin starts</translation>
+    </message>
+    <message>
+        <source>Window behavior</source>
+        <translation>Window behavior</translation>
+    </message>
+    <message>
+        <source>Window position memory:</source>
+        <translation>Window position memory:</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Enabled</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Disabled</translation>
+    </message>
+    <message>
+        <source>Remember window position and size when closed</source>
+        <translation>Remember window position and size when closed</translation>
+    </message>
+    <message>
+        <source>Disabling position memory will clear existing window position storage</source>
+        <translation>Disabling position memory will clear existing window position storage</translation>
+    </message>
+    <message>
+        <source>Settings API unavailable, changes will not persist</source>
+        <translation>Settings API unavailable, changes will not persist</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>Apply</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Settings saved</source>
+        <translation>Settings saved</translation>
+    </message>
+    <message>
+        <source>Settings applied</source>
+        <translation>Settings applied</translation>
+    </message>
+    <message>
+        <source>Settings save failed</source>
+        <translation>Settings save failed</translation>
+    </message>
+    <message>
+        <source>Settings dialog initialization failed</source>
+        <translation>Settings dialog initialization failed</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Close</translation>
+    </message>
+</context>
 </TS>

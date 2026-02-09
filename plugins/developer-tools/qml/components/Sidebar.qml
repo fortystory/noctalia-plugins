@@ -46,6 +46,7 @@ Item {
 
     // ==================== 信号定义 ====================
     signal toolSelected(int index, string toolName)
+    signal settingsButtonClicked()  // 新增：设置按钮点击信号
 
     // ==================== 视觉属性 ====================
     // 背景矩形
@@ -267,10 +268,16 @@ Item {
                 verticalCenterOffset: theme.spacingSmall
             }
             buttonIcon: "⚙️"
-            tooltip: qsTr("设置")
+            tooltip: qsTr("Settings")
             onClicked: {
-                console.log("设置按钮点击")
-                // TODO: 实现设置功能
+                console.log("设置按钮点击，打开设置对话框")
+
+                // 触发设置对话框显示信号
+                if (typeof settingsButtonClicked === "function") {
+                    settingsButtonClicked()
+                } else {
+                    console.warn("settingsButtonClicked信号未定义，请确保父组件已连接")
+                }
             }
         }
     }

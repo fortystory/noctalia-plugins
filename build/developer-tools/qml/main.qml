@@ -29,6 +29,9 @@ ApplicationWindow {
     // 当前工具组件
     property var currentTool: null
 
+    // 设置对话框引用（新增）
+    property var settingsDialog: null
+
     // 工具加载器
     Loader {
         id: toolLoader
@@ -130,6 +133,23 @@ ApplicationWindow {
                         currentTool.showMessage.connect(showMessageHandler)
                     }
                 }
+            }
+        }
+
+        // 新增：设置按钮点击处理
+        onSettingsButtonClicked: {
+            console.log("Sidebar settings button clicked")
+
+            if (settingsDialog) {
+                // 确保对话框引用最新的API和模型
+                settingsDialog.pluginApi = pluginApi
+                settingsDialog.toolModel = sidebar.toolModel
+
+                // 显示设置对话框
+                settingsDialog.showDialog()
+            } else {
+                console.error("Settings dialog not available")
+                showMessage(qsTr("Settings dialog initialization failed"), "error")
             }
         }
     }
@@ -301,30 +321,58 @@ ApplicationWindow {
             opacity = 1
             scale = 1
 
-            // 恢复上次的位置
-            var x = pluginApi.settings.value("window/x", -1)
-            var y = pluginApi.settings.value("window/y", -1)
-            if (x !== -1 && y !== -1) {
-                mainWindow.x = x
-                mainWindow.y = y
+            // 恢复上次的位置（第324-334行）
+            var positionMemoryEnabled = pluginApi.settings.value("preferences/windowPositionMemory", true)
+
+            if (positionMemoryEnabled) {
+                var x = pluginApi.settings.value("window/x", -1)
+                var y = pluginApi.settings.value("window/y", -1)
+                if (x !== -1 && y !== -1) {
+                    mainWindow.x = x
+                    mainWindow.y = y
+                    console.log("Window position restored (position memory enabled)")
+                } else {
+                    // 默认居中显示
+                    mainWindow.x = (Screen.width - width) / 2
+                    mainWindow.y = (Screen.height - height) / 2
+                    console.log("Window position centered (no saved position)")
+                }
             } else {
-                // 默认居中显示
+                // 位置记忆禁用时始终居中
                 mainWindow.x = (Screen.width - width) / 2
                 mainWindow.y = (Screen.height - height) / 2
+                console.log("Window position centered (position memory disabled)")
             }
 
-            // 恢复上次选择的工具
+            // 恢复上次选择的工具（第336-338行）
             var lastTool = pluginApi.settings.value("sidebar/lastTool", 0)
-            sidebar.selectTool(lastTool)
+
+            // 优先使用设置中的默认工具（修改后）
+            var defaultToolSetting = pluginApi.settings.value("preferences/defaultTool", 0)
+            var toolToSelect = defaultToolSetting
+
+            // 但如果用户上次选择了其他工具，使用上次选择（保持向后兼容）
+            if (pluginApi.settings.contains("sidebar/lastTool")) {
+                toolToSelect = lastTool
+            }
+
+            sidebar.selectTool(toolToSelect)
 
         } else {
             console.log("Window hidden")
 
-            // 保存窗口位置和大小
-            pluginApi.settings.setValue("window/x", mainWindow.x)
-            pluginApi.settings.setValue("window/y", mainWindow.y)
-            pluginApi.settings.setValue("window/width", mainWindow.width)
-            pluginApi.settings.setValue("window/height", mainWindow.height)
+            // 保存窗口位置和大小（第353-357行）
+            var positionMemoryEnabled = pluginApi.settings.value("preferences/windowPositionMemory", true)
+
+            if (positionMemoryEnabled) {
+                pluginApi.settings.setValue("window/x", mainWindow.x)
+                pluginApi.settings.setValue("window/y", mainWindow.y)
+                pluginApi.settings.setValue("window/width", mainWindow.width)
+                pluginApi.settings.setValue("window/height", mainWindow.height)
+                console.log("Window position saved (position memory enabled)")
+            } else {
+                console.log("Window position not saved (position memory disabled)")
+            }
 
             // 更新缓存尺寸
             _windowWidth = mainWindow.width
@@ -391,6 +439,51 @@ ApplicationWindow {
         messageTimer.restart()
     }
 
+    // 创建设置对话框
+    function createSettingsDialog() {
+        console.log("Creating settings dialog...")
+
+        try {
+            // 动态创建SettingsDialog组件
+            var dialogComponent = Qt.createComponent("../components/SettingsDialog.qml")
+
+            if (dialogComponent.status === Component.Ready) {
+                settingsDialog = dialogComponent.createObject(mainWindow, {
+                    "theme": theme,
+                    "pluginApi": pluginApi,
+                    "toolModel": sidebar.toolModel
+                })
+
+                if (settingsDialog) {
+                    console.log("Settings dialog created successfully")
+
+                    // 连接对话框信号
+                    settingsDialog.settingsSaved.connect(function() {
+                        console.log("Settings saved signal received")
+                        // 可以在这里添加设置保存后的额外处理
+                    })
+
+                    settingsDialog.settingsApplied.connect(function() {
+                        console.log("Settings applied signal received")
+                        // 可以在这里添加设置应用后的额外处理
+                    })
+
+                    settingsDialog.dialogClosed.connect(function() {
+                        console.log("Settings dialog closed signal received")
+                        // 可以在这里添加对话框关闭后的清理
+                    })
+
+                } else {
+                    console.error("Failed to create settings dialog object")
+                }
+            } else {
+                console.error("Failed to load settings dialog component:", dialogComponent.errorString())
+            }
+        } catch (error) {
+            console.error("Error creating settings dialog:", error)
+        }
+    }
+
     // 公共方法：切换窗口显示/隐藏
     function toggle() {
         console.log("Toggling window, current visible:", visible)
@@ -417,6 +510,9 @@ ApplicationWindow {
 
         // 创建主题实例
         theme = Qt.createQmlObject('import QtQuick 2.15; QtObject {}', mainWindow)
+
+        // 创建设置对话框（新增）
+        createSettingsDialog()
 
         // 设置主题属性绑定
         if (pluginApi && pluginApi.style) {
