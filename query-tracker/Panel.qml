@@ -108,28 +108,23 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (!pluginApi) return;
-                            var screen = pluginApi?.panelOpenScreen;
-                            if (screen) {
-                                pluginApi.closePanel(screen);
+
+                            // Close panel first
+                            var currentScreen = pluginApi.panelOpenScreen;
+                            if (currentScreen) {
+                                pluginApi.closePanel(currentScreen);
                                 Qt.callLater(function() {
-                                    BarService.openPluginSettings(screen, pluginApi.manifest);
-                                });
-                            } else if (pluginApi && pluginApi.withCurrentScreen) {
-                                pluginApi.withCurrentScreen(function(s) {
-                                    pluginApi.closePanel(s);
-                                    Qt.callLater(function() {
-                                        BarService.openPluginSettings(s, pluginApi.manifest);
-                                    });
+                                    try {
+                                        pluginApi.openSettings();
+                                    } catch (e) {
+                                        Logger.w("Query Tracker", "openSettings failed:", e);
+                                    }
                                 });
                             } else {
                                 try {
-                                    pluginApi.openSettings(root.screen, root);
+                                    pluginApi.openSettings();
                                 } catch (e) {
-                                    try {
-                                        pluginApi.openSettings();
-                                    } catch (err) {
-                                        Logger.w("Query Tracker", "openSettings failed:", err);
-                                    }
+                                    Logger.w("Query Tracker", "openSettings failed:", e);
                                 }
                             }
                         }

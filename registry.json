@@ -2,8 +2,8 @@
   "version": 1,
   "plugins": [
     {
-      "id": "developer-tools",
-      "name": "Developer Tools",
+      "id": "d-tool",
+      "name": "d-tool",
       "version": "1.0.0",
       "author": "forty",
       "description": "Collection of developer utilities including timestamp converter and JSON formatter",
@@ -14,8 +14,8 @@
     },
     {
       "id": "query-tracker",
-      "name": "Query Tracker",
-      "version": "1.0.0",
+      "name": "query-tracker",
+      "version": "1.0.2",
       "author": "forty",
       "description": "Track and monitor shell command execution results",
       "repository": "https://github.com/fortystory/noctalia-plugins",

@@ -1,6 +1,6 @@
 {
-  "id": "developer-tools",
-  "name": "Developer Tools",
+  "id": "d-tool",
+  "name": "D-Tool",
   "version": "1.0.0",
   "author": "Forty",
   "description": "Collection of developer utilities including timestamp converter and JSON formatter",

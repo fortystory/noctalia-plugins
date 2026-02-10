@@ -20,6 +20,10 @@ ColumnLayout {
 
     property int updateInterval: (cfg.updateInterval ?? defaults.updateInterval ?? 30)
 
+    // Temporary fields for adding new command
+    property string newCmdName: ""
+    property string newCmdCommand: ""
+
     function syncFromSettings() {
         if (!pluginApi) return;
         const newCfg = pluginApi.pluginSettings || {};
@@ -33,7 +37,7 @@ ColumnLayout {
         Logger.d("Query Tracker", "Sync from settings:", commandCount, "commands");
     }
 
-    function syncToSettings() {
+    function saveSettings() {
         if (!pluginApi) {
             Logger.e("Query Tracker: Cannot save settings - pluginApi is null");
             return;
@@ -52,21 +56,6 @@ ColumnLayout {
         Logger.d("Query Tracker", "Settings saved successfully");
     }
 
-    // Watch for external setting changes
-    Timer {
-        id: settingsWatchTimer
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: {
-            syncFromSettings();
-        }
-    }
-
-    // Temporary fields for adding new command
-    property string newCmdName: ""
-    property string newCmdCommand: ""
-
     function addCommand() {
         if (newCmdName.trim() === "" || newCmdCommand.trim() === "") {
             Logger.e("Query Tracker: Name and command are required");
@@ -79,20 +68,20 @@ ColumnLayout {
             command: newCmdCommand.trim()
         });
         localCommands = newCmds;
-        commandCount = newCmds.length;  // Sync counter
+        commandCount = newCmds.length;
 
         newCmdName = "";
         newCmdCommand = "";
 
-        syncToSettings();
+        saveSettings();
     }
 
     function removeCommand(index) {
         const newCmds = localCommands.slice();
         newCmds.splice(index, 1);
         localCommands = newCmds;
-        commandCount = newCmds.length;  // Sync counter
-        syncToSettings();
+        commandCount = newCmds.length;
+        saveSettings();
     }
 
     function updateCommand(index, name, command) {
@@ -104,8 +93,7 @@ ColumnLayout {
             command: command
         };
         localCommands = newCmds;
-        // commandCount unchanged
-        syncToSettings();
+        saveSettings();
     }
 
     function clearResults() {
@@ -116,6 +104,17 @@ ColumnLayout {
         pluginApi.pluginSettings.results = [];
         pluginApi.saveSettings();
         Logger.d("Query Tracker", "Results cleared");
+    }
+
+    // Watch for external setting changes
+    Timer {
+        id: settingsWatchTimer
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            syncFromSettings();
+        }
     }
 
     // Update Interval
@@ -137,7 +136,7 @@ ColumnLayout {
                 value: updateInterval
                 onValueChanged: {
                     updateInterval = value;
-                    syncToSettings();
+                    saveSettings();
                 }
             }
 
@@ -227,7 +226,7 @@ ColumnLayout {
                 Text {
                     text: pluginApi?.tr("settings.command", "Command") || "Command"
                     font.pixelSize: Style.fontSizeS || 12
-                    color: Style.textColorSecondary || "#FFFFFF"
+                    color: Style.textColorSecondary || "#AAAAAA"
                 }
 
                 NTextInput {
@@ -343,7 +342,6 @@ ColumnLayout {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    // Confirm before delete
                                     confirmDialog.index = index;
                                     confirmDialog.commandName = cmdData.name;
                                     confirmDialog.open();
