@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import qs.Commons
 import qs.Services.UI
 import qs.Widgets
@@ -22,25 +23,6 @@ Item {
     property bool altPressed: false
     property bool superPressed: false
 
-    // Update modifier states periodically
-    Timer {
-        id: modifierTimer
-        interval: 16  // ~60fps
-        running: true
-        repeat: true
-        onTriggered: {
-            const mods = Qt.application.keyboardModifiers;
-            shiftPressed = (mods & Qt.ShiftModifier) !== 0;
-            ctrlPressed = (mods & Qt.ControlModifier) !== 0;
-            altPressed = (mods & Qt.AltModifier) !== 0;
-            superPressed = (mods & Qt.MetaModifier) !== 0;
-        }
-    }
-
-    Component.onCompleted: {
-        Logger.d("Modifier Keys", "BarWidget loaded");
-    }
-
     readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS * 2
     readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS * 2
 
@@ -49,6 +31,88 @@ Item {
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
+
+    // Process to monitor keyboard events via libinput
+    Process {
+        id: keyboardMonitor
+        running: true
+
+        property var pendingLine: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                const line = data.toString();
+                parseLibinputLine(line);
+            }
+        }
+
+        stderr: SplitParser {
+            onRead: data => {
+                Logger.w("Modifier Keys", "libinput stderr:", data.toString());
+            }
+        }
+
+        onExited: (code, status) => {
+            Logger.w("Modifier Keys", "libinput process exited:", code, status);
+            // Restart after a delay if it crashes
+            restartTimer.start();
+        }
+    }
+
+    Timer {
+        id: restartTimer
+        interval: 2000
+        onTriggered: {
+            if (!keyboardMonitor.running) {
+                keyboardMonitor.running = true;
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        Logger.d("Modifier Keys", "BarWidget loaded");
+        startKeyboardMonitor();
+    }
+
+    function startKeyboardMonitor() {
+        // Use libinput debug-events to monitor keyboard
+        // Requires user to be in 'input' group
+        // Note: libinput debug-events monitors all input devices by default
+        keyboardMonitor.command = ["libinput", "debug-events"];
+        keyboardMonitor.running = true;
+        Logger.d("Modifier Keys", "Starting libinput monitor");
+    }
+
+    function parseLibinputLine(line) {
+        // libinput debug-events output format:
+        // event4   KEYBOARD_KEY    +2.15s	KEY_LEFTSHIFT (42) pressed
+        // event4   KEYBOARD_KEY    +2.18s	KEY_LEFTSHIFT (42) released
+
+        if (!line.includes("KEYBOARD_KEY")) return;
+
+        const isPressed = line.includes("pressed");
+        const isReleased = line.includes("released");
+
+        if (!isPressed && !isReleased) return;
+
+        // Extract key name
+        const keyMatch = line.match(/KEY_(\w+)\s*\(/);
+        if (!keyMatch) return;
+
+        const keyName = keyMatch[1].toUpperCase();
+        const state = isPressed;
+
+        // Map keys to modifiers
+        if (keyName === "LEFTSHIFT" || keyName === "RIGHTSHIFT") {
+            if (shiftPressed !== state) shiftPressed = state;
+        } else if (keyName === "LEFTCTRL" || keyName === "RIGHTCTRL") {
+            if (ctrlPressed !== state) ctrlPressed = state;
+        } else if (keyName === "LEFTALT" || keyName === "RIGHTALT") {
+            if (altPressed !== state) altPressed = state;
+        } else if (keyName === "LEFTMETA" || keyName === "RIGHTMETA") {
+            if (superPressed !== state) superPressed = state;
+        }
+    }
 
     Rectangle {
         id: visualCapsule
