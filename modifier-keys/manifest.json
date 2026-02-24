@@ -1,0 +1,20 @@
+{
+  "id": "modifier-keys",
+  "name": "Modifier Keys",
+  "version": "1.0.0",
+  "description": "Display keyboard modifier keys status (Ctrl, Alt, Super, Shift) in the status bar",
+  "repository": "https://github.com/fortystory/noctalia-plugins",
+  "author": "forty",
+  "license": "MIT",
+  "minNoctaliaVersion": "3.6.0",
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml"
+  },
+  "dependencies": {
+    "plugins": []
+  },
+  "metadata": {
+    "defaultSettings": {}
+  }
+}
