@@ -23,6 +23,9 @@ Item {
     property bool altPressed: false
     property bool superPressed: false
 
+    // Normal keys (max 5)
+    property var pressedKeys: []
+
     readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS * 2
     readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS * 2
 
@@ -34,6 +37,156 @@ Item {
 
     Component.onCompleted: {
         Logger.d("Modifier Keys", "BarWidget loaded");
+    }
+
+    // Key display name mapping (Nerd Fonts symbols)
+    // 始终显示原始键值，不根据修饰键状态转换
+    function getKeyDisplayName(keyName) {
+        const keyMap = {
+            // Function keys
+            "F1": "F1", "F2": "F2", "F3": "F3", "F4": "F4", "F5": "F5", "F6": "F6",
+            "F7": "F7", "F8": "F8", "F9": "F9", "F10": "F10", "F11": "F11", "F12": "F12",
+            // Navigation keys (Nerd Fonts)
+            "HOME": "", "END": "", "PAGEUP": "", "PAGEDOWN": "",
+            "INSERT": "", "DELETE": "⌦",
+            // Arrow keys (Nerd Fonts)
+            "UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→",
+            // Media keys (Nerd Fonts)
+            "PLAYPAUSE": "\uf04b", "STOP": "\uf04d", "PREVIOUS": "\uf048", "NEXT": "\uf051",
+            "MUTE": "\uf023", "VOLUMEUP": "\uf028", "VOLUMEDOWN": "\uf027",
+            // Special keys (Nerd Fonts)
+            "SPACE": "󱁐", "TAB": "", "ENTER": "↩", "ESCAPE": "⎋","ESC":"⎋",
+            "BACKSPACE": "⌫", "CAPSLOCK": "⇪", "PAUSE": "\uf4c8", "PRINT": "\uf57d",
+            "NUMLOCK": "\uf7c3", "SCROLLLOCK": "\uf86c",
+            // Modifiers (for display, though handled separately)
+            "LEFTSHIFT": "\uf17d", "RIGHTSHIFT": "\uf17e",
+            "LEFTCTRL": "\uf201", "RIGHTCTRL": "\uf202",
+            "LEFTALT": "\uf19a", "RIGHTALT": "\uf19b",
+            "LEFTMETA": "\uf17b", "RIGHTMETA": "\uf17c",
+            "SLASH":"/","BACKSLASH":"\\","APOSTROPHE":"\"","SEMICOLON":";","LEFTBRACE":"[","RIGHTBRACE":"]",
+            "COMMA":",","DOT":".",
+        };
+
+        if (keyMap[keyName]) return keyMap[keyName];
+
+        // Letters A-Z - 始终显示小写（原始键值）
+        if (/^[A-Z]$/.test(keyName)) {
+            return keyName.toLowerCase();
+        }
+
+        // Numbers 0-9 - 始终显示数字（原始键值）
+        if (/^[0-9]$/.test(keyName)) {
+            return keyName;
+        }
+
+        // Other keys - return as-is
+        return keyName;
+    }
+
+    // Display keys (for showing, with fade delay)
+    property var displayKeys: []
+
+    // 是否处于延迟显示状态
+    property bool isFading: false
+
+    // 记录在按下普通键时哪些修饰键是激活的（用于延迟时高亮）
+    property bool shiftInCombo: false
+    property bool ctrlInCombo: false
+    property bool altInCombo: false
+    property bool superInCombo: false
+
+    // 单独按修饰键时的延迟状态
+    property bool shiftFading: false
+    property bool ctrlFading: false
+    property bool altFading: false
+    property bool superFading: false
+
+    // Add key to pressed keys list
+    function addKey(keyName) {
+        // Don't add modifier keys to the list
+        const modifiers = ["LEFTSHIFT", "RIGHTSHIFT", "LEFTCTRL", "RIGHTCTRL",
+                          "LEFTALT", "RIGHTALT", "LEFTMETA", "RIGHTMETA"];
+        if (modifiers.includes(keyName)) return;
+
+        // Check if already in list
+        for (let i = 0; i < pressedKeys.length; i++) {
+            if (pressedKeys[i] === keyName) return;
+        }
+
+        // 记录当前哪些修饰键是按下的（用于组合键）
+        shiftInCombo = shiftPressed;
+        ctrlInCombo = ctrlPressed;
+        altInCombo = altPressed;
+        superInCombo = superPressed;
+
+        // Add to list (max 5 keys)
+        const newKeys = pressedKeys.slice();
+        newKeys.push(keyName);
+        if (newKeys.length > 5) {
+            newKeys.shift(); // Remove oldest
+        }
+        pressedKeys = newKeys;
+
+        // Update display immediately
+        displayKeys = pressedKeys.slice();
+        isFading = false;
+
+        // Reset fade timer
+        fadeTimer.stop();
+        fadeTimer.start();
+    }
+
+    // Remove key from pressed keys list
+    function removeKey(keyName) {
+        const newKeys = [];
+        for (let i = 0; i < pressedKeys.length; i++) {
+            if (pressedKeys[i] !== keyName) {
+                newKeys.push(pressedKeys[i]);
+            }
+        }
+        pressedKeys = newKeys;
+
+        // 组合键标识
+        const hasComboModifiers = shiftInCombo || ctrlInCombo || altInCombo || superInCombo;
+
+        if (pressedKeys.length > 0) {
+            // 还有其他键按下
+            displayKeys = pressedKeys.slice();
+            isFading = true;
+            fadeTimer.stop();
+            fadeTimer.start();
+        } else if (displayKeys.length > 0) {
+            // 所有键都松开了，只要有按过的键就进入延迟状态
+            isFading = true;
+            fadeTimer.stop();
+            fadeTimer.start();
+        } else {
+            // 没有按过任何键
+            displayKeys = [];
+            isFading = false;
+        }
+    }
+
+    // Timer for fade delay (2 seconds)
+    Timer {
+        id: fadeTimer
+        interval: 2000
+        onTriggered: {
+            displayKeys = [];
+            isFading = false;
+        }
+    }
+
+    // Timer for modifier key fade delay (2 seconds)
+    Timer {
+        id: modifierFadeTimer
+        interval: 2000
+        onTriggered: {
+            shiftFading = false;
+            ctrlFading = false;
+            altFading = false;
+            superFading = false;
+        }
     }
 
     // Process to monitor keyboard events via libinput
@@ -87,13 +240,73 @@ Item {
 
         // Map keys to modifiers
         if (keyName === "LEFTSHIFT" || keyName === "RIGHTSHIFT") {
-            if (shiftPressed !== state) shiftPressed = state;
+            if (shiftPressed !== state) {
+                if (!state) {
+                    // 松开时启动延迟
+                    shiftFading = true;
+                    modifierFadeTimer.stop();
+                    modifierFadeTimer.start();
+                } else {
+                    // 按下时清除其他修饰键的 fading 状态
+                    shiftFading = false;
+                    ctrlFading = false;
+                    altFading = false;
+                    superFading = false;
+                }
+                shiftPressed = state;
+            }
         } else if (keyName === "LEFTCTRL" || keyName === "RIGHTCTRL") {
-            if (ctrlPressed !== state) ctrlPressed = state;
+            if (ctrlPressed !== state) {
+                if (!state) {
+                    ctrlFading = true;
+                    modifierFadeTimer.stop();
+                    modifierFadeTimer.start();
+                } else {
+                    // 按下时清除其他修饰键的 fading 状态
+                    shiftFading = false;
+                    ctrlFading = false;
+                    altFading = false;
+                    superFading = false;
+                }
+                ctrlPressed = state;
+            }
         } else if (keyName === "LEFTALT" || keyName === "RIGHTALT") {
-            if (altPressed !== state) altPressed = state;
+            if (altPressed !== state) {
+                if (!state) {
+                    altFading = true;
+                    modifierFadeTimer.stop();
+                    modifierFadeTimer.start();
+                } else {
+                    // 按下时清除其他修饰键的 fading 状态
+                    shiftFading = false;
+                    ctrlFading = false;
+                    altFading = false;
+                    superFading = false;
+                }
+                altPressed = state;
+            }
         } else if (keyName === "LEFTMETA" || keyName === "RIGHTMETA") {
-            if (superPressed !== state) superPressed = state;
+            if (superPressed !== state) {
+                if (!state) {
+                    superFading = true;
+                    modifierFadeTimer.stop();
+                    modifierFadeTimer.start();
+                } else {
+                    // 按下时清除其他修饰键的 fading 状态
+                    shiftFading = false;
+                    ctrlFading = false;
+                    altFading = false;
+                    superFading = false;
+                }
+                superPressed = state;
+            }
+        } else {
+            // Handle normal keys
+            if (state) {
+                addKey(keyName);
+            } else {
+                removeKey(keyName);
+            }
         }
     }
 
@@ -117,9 +330,9 @@ Item {
             NText {
                 text: "\u2318"
                 pointSize: Style.barFontSize
-                color: superPressed ? Color.mPrimary : Color.mOnSurfaceVariant
-                font.bold: superPressed
-                opacity: superPressed ? 1.0 : 0.5
+                color: (superPressed || superFading || (isFading && superInCombo)) ? Color.mPrimary : Color.mOnSurfaceVariant
+                font.bold: superPressed || superFading || (isFading && superInCombo)
+                opacity: superPressed ? 1.0 : (superFading ? 0.8 : ((isFading && superInCombo) ? 0.8 : 0.5))
 
                 Behavior on color { ColorAnimation { duration: 100 } }
                 Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -129,9 +342,9 @@ Item {
             NText {
                 text: "\u2325"
                 pointSize: Style.barFontSize
-                color: altPressed ? Color.mPrimary : Color.mOnSurfaceVariant
-                font.bold: altPressed
-                opacity: altPressed ? 1.0 : 0.5
+                color: (altPressed || altFading || (isFading && altInCombo)) ? Color.mPrimary : Color.mOnSurfaceVariant
+                font.bold: altPressed || altFading || (isFading && altInCombo)
+                opacity: altPressed ? 1.0 : (altFading ? 0.8 : ((isFading && altInCombo) ? 0.8 : 0.5))
 
                 Behavior on color { ColorAnimation { duration: 100 } }
                 Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -141,9 +354,9 @@ Item {
             NText {
                 text: "\u2303"
                 pointSize: Style.barFontSize
-                color: ctrlPressed ? Color.mPrimary : Color.mOnSurfaceVariant
-                font.bold: ctrlPressed
-                opacity: ctrlPressed ? 1.0 : 0.5
+                color: (ctrlPressed || ctrlFading || (isFading && ctrlInCombo)) ? Color.mPrimary : Color.mOnSurfaceVariant
+                font.bold: ctrlPressed || ctrlFading || (isFading && ctrlInCombo)
+                opacity: ctrlPressed ? 1.0 : (ctrlFading ? 0.8 : ((isFading && ctrlInCombo) ? 0.8 : 0.5))
 
                 Behavior on color { ColorAnimation { duration: 100 } }
                 Behavior on opacity { NumberAnimation { duration: 100 } }
@@ -153,12 +366,77 @@ Item {
             NText {
                 text: "\u21e7"
                 pointSize: Style.barFontSize
-                color: shiftPressed ? Color.mPrimary : Color.mOnSurfaceVariant
-                font.bold: shiftPressed
-                opacity: shiftPressed ? 1.0 : 0.5
+                color: (shiftPressed || shiftFading || (isFading && shiftInCombo)) ? Color.mPrimary : Color.mOnSurfaceVariant
+                font.bold: shiftPressed || shiftFading || (isFading && shiftInCombo)
+                opacity: shiftPressed ? 1.0 : (shiftFading ? 0.8 : ((isFading && shiftInCombo) ? 0.8 : 0.5))
 
                 Behavior on color { ColorAnimation { duration: 100 } }
                 Behavior on opacity { NumberAnimation { duration: 100 } }
+            }
+
+            // Normal keys display (max 5) - always show 5 placeholder slots
+            RowLayout {
+                id: normalKeysRow
+                spacing: 2
+                // 固定5个位置宽度: 5*16 + 4*2间距 = 88
+                Layout.preferredWidth: 88
+
+                // Placeholder slots (always show 5) - 每个固定宽度16
+                Item {
+                    width: 16
+                    NText {
+                        anchors.centerIn: parent
+                        text: displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""
+                        pointSize: Style.barFontSize - 1
+                        color: displayKeys.length > 0 ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: displayKeys.length > 0
+                        opacity: displayKeys.length > 0 ? (isFading ? 0.6 : 1.0) : 0.2
+                    }
+                }
+                Item {
+                    width: 16
+                    NText {
+                        anchors.centerIn: parent
+                        text: displayKeys.length > 1 ? root.getKeyDisplayName(displayKeys[1]) : ""
+                        pointSize: Style.barFontSize - 1
+                        color: displayKeys.length > 1 ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: displayKeys.length > 1
+                        opacity: displayKeys.length > 1 ? (isFading ? 0.6 : 1.0) : 0.2
+                    }
+                }
+                Item {
+                    width: 16
+                    NText {
+                        anchors.centerIn: parent
+                        text: displayKeys.length > 2 ? root.getKeyDisplayName(displayKeys[2]) : ""
+                        pointSize: Style.barFontSize - 1
+                        color: displayKeys.length > 2 ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: displayKeys.length > 2
+                        opacity: displayKeys.length > 2 ? (isFading ? 0.6 : 1.0) : 0.2
+                    }
+                }
+                Item {
+                    width: 16
+                    NText {
+                        anchors.centerIn: parent
+                        text: displayKeys.length > 3 ? root.getKeyDisplayName(displayKeys[3]) : ""
+                        pointSize: Style.barFontSize - 1
+                        color: displayKeys.length > 3 ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: displayKeys.length > 3
+                        opacity: displayKeys.length > 3 ? (isFading ? 0.6 : 1.0) : 0.2
+                    }
+                }
+                Item {
+                    width: 16
+                    NText {
+                        anchors.centerIn: parent
+                        text: displayKeys.length > 4 ? root.getKeyDisplayName(displayKeys[4]) : ""
+                        pointSize: Style.barFontSize - 1
+                        color: displayKeys.length > 4 ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: displayKeys.length > 4
+                        opacity: displayKeys.length > 4 ? (isFading ? 0.6 : 1.0) : 0.2
+                    }
+                }
             }
         }
     }
