@@ -32,23 +32,20 @@ Item {
     implicitWidth: contentWidth
     implicitHeight: contentHeight
 
+    Component.onCompleted: {
+        Logger.d("Modifier Keys", "BarWidget loaded");
+    }
+
     // Process to monitor keyboard events via libinput
     Process {
         id: keyboardMonitor
-        running: true
 
-        property var pendingLine: ""
+        command: ["libinput", "debug-events", "--show-keycodes"]
+        running: true
 
         stdout: SplitParser {
             onRead: data => {
-                const line = data.toString();
-                parseLibinputLine(line);
-            }
-        }
-
-        stderr: SplitParser {
-            onRead: data => {
-                Logger.w("Modifier Keys", "libinput stderr:", data.toString());
+                parseLibinputLine(data.toString());
             }
         }
 
@@ -67,20 +64,6 @@ Item {
                 keyboardMonitor.running = true;
             }
         }
-    }
-
-    Component.onCompleted: {
-        Logger.d("Modifier Keys", "BarWidget loaded");
-        startKeyboardMonitor();
-    }
-
-    function startKeyboardMonitor() {
-        // Use libinput debug-events to monitor keyboard
-        // Requires user to be in 'input' group
-        // Note: libinput debug-events monitors all input devices by default
-        keyboardMonitor.command = ["libinput", "debug-events"];
-        keyboardMonitor.running = true;
-        Logger.d("Modifier Keys", "Starting libinput monitor");
     }
 
     function parseLibinputLine(line) {
