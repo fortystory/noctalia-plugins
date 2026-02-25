@@ -171,7 +171,7 @@ Item {
     // Timer for fade delay (2 seconds)
     Timer {
         id: fadeTimer
-        interval: 2000
+        interval: 1000
         onTriggered: {
             displayKeys = [];
             isFading = false;
@@ -186,7 +186,7 @@ Item {
     // Timer for modifier key fade delay (2 seconds)
     Timer {
         id: modifierFadeTimer
-        interval: 2000
+        interval: 1000
         onTriggered: {
             shiftFading = false;
             ctrlFading = false;
@@ -217,7 +217,7 @@ Item {
 
     Timer {
         id: restartTimer
-        interval: 2000
+        interval: 1000
         onTriggered: {
             if (!keyboardMonitor.running) {
                 keyboardMonitor.running = true;
