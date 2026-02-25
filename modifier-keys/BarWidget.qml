@@ -113,8 +113,14 @@ Item {
             if (pressedKeys[i] === keyName) return;
         }
 
-        // 每次按下新普通键时，重新检查当前修饰键状态
-        // 只有当前仍然按下的修饰键才高亮
+        // 按下新普通键时，清除所有之前的修饰键 fading 状态
+        // 只根据当前是否按下来决定高亮
+        shiftFading = false;
+        ctrlFading = false;
+        altFading = false;
+        superFading = false;
+
+        // 重新检查当前修饰键状态
         shiftInCombo = shiftPressed;
         ctrlInCombo = ctrlPressed;
         altInCombo = altPressed;
@@ -128,8 +134,8 @@ Item {
         }
         pressedKeys = newKeys;
 
-        // Update display immediately
-        displayKeys = pressedKeys.slice();
+        // Update display immediately (only keep 1)
+        displayKeys = [newKeys[newKeys.length - 1]];
         isFading = false;
 
         // Reset fade timer
@@ -147,24 +153,18 @@ Item {
         }
         pressedKeys = newKeys;
 
-        // 组合键标识
-        const hasComboModifiers = shiftInCombo || ctrlInCombo || altInCombo || superInCombo;
-
+        // 始终更新 displayKeys 为当前按下的键（只保留最新1个）
         if (pressedKeys.length > 0) {
-            // 还有其他键按下
-            displayKeys = pressedKeys.slice();
-            isFading = true;
-            fadeTimer.stop();
-            fadeTimer.start();
-        } else if (displayKeys.length > 0) {
-            // 所有键都松开了，只要有按过的键就进入延迟状态
+            displayKeys = [pressedKeys[pressedKeys.length - 1]];
             isFading = true;
             fadeTimer.stop();
             fadeTimer.start();
         } else {
-            // 没有按过任何键
-            displayKeys = [];
-            isFading = false;
+            // 所有键都松开了，进入延迟状态
+            // 保持 displayKeys 不变（最后按下的键）
+            isFading = true;
+            fadeTimer.stop();
+            fadeTimer.start();
         }
     }
 
