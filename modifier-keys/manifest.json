@@ -1,7 +1,7 @@
 {
   "id": "modifier-keys",
   "name": "Modifier Keys",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Display keyboard modifier keys status (Ctrl, Alt, Super, Shift) in the status bar",
   "repository": "https://github.com/fortystory/noctalia-plugins",
   "author": "forty",

@@ -64,8 +64,9 @@ Item {
             "LEFTCTRL": "\uf201", "RIGHTCTRL": "\uf202",
             "LEFTALT": "\uf19a", "RIGHTALT": "\uf19b",
             "LEFTMETA": "\uf17b", "RIGHTMETA": "\uf17c",
+            //symbls
             "SLASH":"/","BACKSLASH":"\\","APOSTROPHE":"\"","SEMICOLON":";","LEFTBRACE":"[","RIGHTBRACE":"]",
-            "COMMA":",","DOT":".",
+            "COMMA":",","DOT":".","KPPLUS":"+","MINUS":"-","GRAVE":"~"
         };
 
         if (keyMap[keyName]) return keyMap[keyName];
