@@ -53,6 +53,7 @@ Item {
             "UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→",
             // Media keys (Nerd Fonts)
             "PLAYPAUSE": "󰐎", "PAUSE": "", "STOP": "", "PREVIOUS": "󰒮", "NEXT": "󰒭",
+            "PREVIOUSSONG": "󰒮", "NEXTSONG": "󰒭",
             "MUTE": "", "VOLUMEUP": "", "VOLUMEDOWN": "",
             // Special keys (Nerd Fonts)
             "SPACE": "󱁐", "TAB": "", "ENTER": "󰌑", "ESCAPE": "⎋","ESC":"⎋",
