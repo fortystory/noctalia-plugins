@@ -7,6 +7,7 @@
 Noctalia Shell 插件项目，包含多个插件：
 - **developer-tools**: 开发者工具集合（时间戳转换、JSON 格式化）
 - **query-tracker**: Shell 命令执行结果监控器
+- **modifier-keys**: 键盘修饰键状态显示（Super、Alt、Ctrl、Shift）
 
 ## 常用开发命令
 
@@ -64,6 +65,18 @@ query-tracker/
 ├── BarWidget.qml          # 状态栏组件（终端图标 + 失败计数徽章）
 ├── Settings.qml           # 设置面板（命令管理 + 编辑/删除对话框）
 ├── Panel.qml              # 结果面板（列表展示命令结果）
+├── README.md              # 插件说明
+└── i18n/                 # 国际化翻译文件 (.json)
+    ├── en.json
+    └── zh-CN.json
+```
+
+#### modifier-keys/
+```
+modifier-keys/
+├── manifest.json          # 插件配置元数据
+├── BarWidget.qml          # 状态栏组件（修饰键图标 + 最近按键）
+├── Panel.qml              # 帮助面板（展示各键名称）
 ├── README.md              # 插件说明
 └── i18n/                 # 国际化翻译文件 (.json)
     ├── en.json
