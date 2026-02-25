@@ -384,12 +384,12 @@ Item {
             RowLayout {
                 id: normalKeysRow
                 spacing: 0
-                // 固定1个位置宽度: 8
-                Layout.preferredWidth: 8
+                // 固定1个位置宽度: 4
+                Layout.preferredWidth: 4
 
                 // Placeholder slot (always show 1) - 固定宽度16
                 Item {
-                    width: 8
+                    width: 4
                     NText {
                         anchors.centerIn: parent
                         text: displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""
