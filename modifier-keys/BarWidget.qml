@@ -113,8 +113,8 @@ Item {
             if (pressedKeys[i] === keyName) return;
         }
 
-        // 清除之前的组合标记，按下新普通键时不再高亮之前的修饰键
-        // 重新记录当前哪些修饰键是按下的
+        // 每次按下新普通键时，重新检查当前修饰键状态
+        // 只有当前仍然按下的修饰键才高亮
         shiftInCombo = shiftPressed;
         ctrlInCombo = ctrlPressed;
         altInCombo = altPressed;
