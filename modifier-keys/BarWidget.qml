@@ -30,7 +30,7 @@ Item {
     readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS * 2
 
     readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
-    readonly property real contentHeight: Math.max(28, isVertical ? visualContentHeight : Style.capsuleHeight)
+    readonly property real contentHeight: Math.max(10, isVertical ? visualContentHeight : Style.capsuleHeight)
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
