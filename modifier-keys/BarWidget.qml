@@ -30,7 +30,7 @@ Item {
     readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS * 2
 
     readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
-    readonly property real contentHeight: Math.max(10, isVertical ? visualContentHeight : Style.capsuleHeight)
+    readonly property real contentHeight: Math.max(28, isVertical ? visualContentHeight : Style.capsuleHeight)
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
@@ -384,12 +384,12 @@ Item {
             RowLayout {
                 id: normalKeysRow
                 spacing: 0
-                // 固定1个位置宽度: 4
-                Layout.preferredWidth: 4
+                // 固定1个位置宽度: 16
+                Layout.preferredWidth: 16
 
                 // Placeholder slot (always show 1) - 固定宽度16
                 Item {
-                    width: 4
+                    width: 16
                     NText {
                         anchors.centerIn: parent
                         text: displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""
