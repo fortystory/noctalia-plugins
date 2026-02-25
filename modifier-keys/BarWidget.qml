@@ -113,24 +113,17 @@ Item {
             if (pressedKeys[i] === keyName) return;
         }
 
-        // 记录当前哪些修饰键是按下的（用于组合键）
+        // 清除之前的组合标记，按下新普通键时不再高亮之前的修饰键
+        // 重新记录当前哪些修饰键是按下的
         shiftInCombo = shiftPressed;
         ctrlInCombo = ctrlPressed;
         altInCombo = altPressed;
         superInCombo = superPressed;
 
-        // 如果没有修饰键在按下状态，则清除组合标记（纯普通键）
-        if (!shiftPressed && !ctrlPressed && !altPressed && !superPressed) {
-            shiftInCombo = false;
-            ctrlInCombo = false;
-            altInCombo = false;
-            superInCombo = false;
-        }
-
-        // Add to list (max 2 keys)
+        // Add to list (max 1 keys)
         const newKeys = pressedKeys.slice();
         newKeys.push(keyName);
-        if (newKeys.length > 2) {
+        if (newKeys.length > 1) {
             newKeys.shift(); // Remove oldest
         }
         pressedKeys = newKeys;
@@ -182,6 +175,11 @@ Item {
         onTriggered: {
             displayKeys = [];
             isFading = false;
+            // 清除组合标记
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
         }
     }
 
@@ -382,14 +380,14 @@ Item {
                 Behavior on opacity { NumberAnimation { duration: 100 } }
             }
 
-            // Normal keys display (max 2) - always show 2 placeholder slots
+            // Normal keys display (max 1) - always show 1 placeholder slot
             RowLayout {
                 id: normalKeysRow
-                spacing: 2
-                // 固定2个位置宽度: 2*16 + 1*2间距 = 34
-                Layout.preferredWidth: 34
+                spacing: 0
+                // 固定1个位置宽度: 16
+                Layout.preferredWidth: 16
 
-                // Placeholder slots (always show 2) - 每个固定宽度16
+                // Placeholder slot (always show 1) - 固定宽度16
                 Item {
                     width: 16
                     NText {
@@ -399,17 +397,6 @@ Item {
                         color: displayKeys.length > 0 ? Color.mPrimary : Color.mOnSurfaceVariant
                         font.bold: displayKeys.length > 0
                         opacity: displayKeys.length > 0 ? (isFading ? 0.6 : 1.0) : 0.2
-                    }
-                }
-                Item {
-                    width: 16
-                    NText {
-                        anchors.centerIn: parent
-                        text: displayKeys.length > 1 ? root.getKeyDisplayName(displayKeys[1]) : ""
-                        pointSize: Style.barFontSize - 1
-                        color: displayKeys.length > 1 ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: displayKeys.length > 1
-                        opacity: displayKeys.length > 1 ? (isFading ? 0.6 : 1.0) : 0.2
                     }
                 }
             }
