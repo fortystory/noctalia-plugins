@@ -119,10 +119,18 @@ Item {
         altInCombo = altPressed;
         superInCombo = superPressed;
 
-        // Add to list (max 5 keys)
+        // 如果没有修饰键在按下状态，则清除组合标记（纯普通键）
+        if (!shiftPressed && !ctrlPressed && !altPressed && !superPressed) {
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
+        }
+
+        // Add to list (max 2 keys)
         const newKeys = pressedKeys.slice();
         newKeys.push(keyName);
-        if (newKeys.length > 5) {
+        if (newKeys.length > 2) {
             newKeys.shift(); // Remove oldest
         }
         pressedKeys = newKeys;
@@ -374,14 +382,14 @@ Item {
                 Behavior on opacity { NumberAnimation { duration: 100 } }
             }
 
-            // Normal keys display (max 5) - always show 5 placeholder slots
+            // Normal keys display (max 2) - always show 2 placeholder slots
             RowLayout {
                 id: normalKeysRow
                 spacing: 2
-                // 固定5个位置宽度: 5*16 + 4*2间距 = 88
-                Layout.preferredWidth: 88
+                // 固定2个位置宽度: 2*16 + 1*2间距 = 34
+                Layout.preferredWidth: 34
 
-                // Placeholder slots (always show 5) - 每个固定宽度16
+                // Placeholder slots (always show 2) - 每个固定宽度16
                 Item {
                     width: 16
                     NText {
@@ -402,39 +410,6 @@ Item {
                         color: displayKeys.length > 1 ? Color.mPrimary : Color.mOnSurfaceVariant
                         font.bold: displayKeys.length > 1
                         opacity: displayKeys.length > 1 ? (isFading ? 0.6 : 1.0) : 0.2
-                    }
-                }
-                Item {
-                    width: 16
-                    NText {
-                        anchors.centerIn: parent
-                        text: displayKeys.length > 2 ? root.getKeyDisplayName(displayKeys[2]) : ""
-                        pointSize: Style.barFontSize - 1
-                        color: displayKeys.length > 2 ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: displayKeys.length > 2
-                        opacity: displayKeys.length > 2 ? (isFading ? 0.6 : 1.0) : 0.2
-                    }
-                }
-                Item {
-                    width: 16
-                    NText {
-                        anchors.centerIn: parent
-                        text: displayKeys.length > 3 ? root.getKeyDisplayName(displayKeys[3]) : ""
-                        pointSize: Style.barFontSize - 1
-                        color: displayKeys.length > 3 ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: displayKeys.length > 3
-                        opacity: displayKeys.length > 3 ? (isFading ? 0.6 : 1.0) : 0.2
-                    }
-                }
-                Item {
-                    width: 16
-                    NText {
-                        anchors.centerIn: parent
-                        text: displayKeys.length > 4 ? root.getKeyDisplayName(displayKeys[4]) : ""
-                        pointSize: Style.barFontSize - 1
-                        color: displayKeys.length > 4 ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: displayKeys.length > 4
-                        opacity: displayKeys.length > 4 ? (isFading ? 0.6 : 1.0) : 0.2
                     }
                 }
             }
