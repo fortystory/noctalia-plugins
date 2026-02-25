@@ -44,19 +44,19 @@ Item {
     function getKeyDisplayName(keyName) {
         const keyMap = {
             // Function keys
-            "F1": "F1", "F2": "F2", "F3": "F3", "F4": "F4", "F5": "F5", "F6": "F6",
-            "F7": "F7", "F8": "F8", "F9": "F9", "F10": "F10", "F11": "F11", "F12": "F12",
+            "F1": "󱊫", "F2": "󱊬", "F3": "󱊭", "F4": "󱊮", "F5": "󱊯", "F6": "󱊰",
+            "F7": "󱊱", "F8": "󱊲", "F9": "󱊳", "F10": "󱊴", "F11": "󱊵", "F12": "󱊶",
             // Navigation keys (Nerd Fonts)
             "HOME": "", "END": "", "PAGEUP": "", "PAGEDOWN": "",
-            "INSERT": "", "DELETE": "⌦",
+            "INSERT": "", "DELETE": "󰹾",
             // Arrow keys (Nerd Fonts)
             "UP": "↑", "DOWN": "↓", "LEFT": "←", "RIGHT": "→",
             // Media keys (Nerd Fonts)
-            "PLAYPAUSE": "\uf04b", "STOP": "\uf04d", "PREVIOUS": "\uf048", "NEXT": "\uf051",
-            "MUTE": "\uf023", "VOLUMEUP": "\uf028", "VOLUMEDOWN": "\uf027",
+            "PLAYPAUSE": "󰐎", "PAUSE": "", "STOP": "", "PREVIOUS": "󰒮", "NEXT": "󰒭",
+            "MUTE": "", "VOLUMEUP": "", "VOLUMEDOWN": "",
             // Special keys (Nerd Fonts)
-            "SPACE": "󱁐", "TAB": "", "ENTER": "↩", "ESCAPE": "⎋","ESC":"⎋",
-            "BACKSPACE": "⌫", "CAPSLOCK": "⇪", "PAUSE": "\uf4c8", "PRINT": "\uf57d",
+            "SPACE": "󱁐", "TAB": "", "ENTER": "󰌑", "ESCAPE": "⎋","ESC":"⎋",
+            "BACKSPACE": "󰁮", "CAPSLOCK": "⇪", "PRINT": "\uf57d",
             "NUMLOCK": "\uf7c3", "SCROLLLOCK": "\uf86c",
             // Modifiers (for display, though handled separately)
             "LEFTSHIFT": "\uf17d", "RIGHTSHIFT": "\uf17e",
