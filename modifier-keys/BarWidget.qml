@@ -66,7 +66,7 @@ Item {
             "LEFTMETA": "\uf17b", "RIGHTMETA": "\uf17c",
             //symbls
             "SLASH":"/","BACKSLASH":"\\","APOSTROPHE":"\"","SEMICOLON":";","LEFTBRACE":"[","RIGHTBRACE":"]",
-            "COMMA":",","DOT":".","KPPLUS":"+","MINUS":"-","EQUAL":"=","GRAVE":"~"
+            "COMMA":",","DOT":".","KPPLUS":"+","MINUS":"-","EQUAL":"=","GRAVE":"`"
         };
 
         if (keyMap[keyName]) return keyMap[keyName];
