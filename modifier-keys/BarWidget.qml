@@ -140,9 +140,7 @@ Item {
         displayKeys = [newKeys[newKeys.length - 1]];
         isFading = false;
 
-        // Reset fade timer
-        fadeTimer.stop();
-        fadeTimer.start();
+        // 按键按下时不启动定时器，只有在所有键松开后才启动
     }
 
     // Remove key from pressed keys list
