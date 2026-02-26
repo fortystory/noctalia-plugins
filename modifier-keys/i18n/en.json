@@ -10,5 +10,12 @@
   "scroll": "Scroll",
   "swipe3": "3-Finger Swipe",
   "swipe4": "4-Finger Swipe",
-  "pinch": "Pinch"
+  "pinch": "Pinch",
+  "settings.label": "Gesture Symbols",
+  "settings.desc": "Customize gesture display symbols (JSON format)",
+  "settings.json": "JSON",
+  "settings.reset": "Reset",
+  "settings.copy": "Copy",
+  "settings.useDefault": "Use Defaults",
+  "settings.keys": "Available Keys"
 }

@@ -23,8 +23,8 @@ ColumnLayout {
         "rightClick": "󰳾",
         "middleClick": "󰻃",
         "motion": "󰆽",
-        "pinchIn": "󰩯",
-        "pinchOut": "󰩮"
+        "pinchIn": "󰘖",
+        "pinchOut": "󰘕"
     }
 
     function getDefaultJson() {
@@ -32,13 +32,13 @@ ColumnLayout {
     }
 
     NLabel {
-        label: "Gesture Symbols"
-        description: "Customize gesture display symbols (JSON format)"
+        label: pluginApi?.tr("settings.label", "Gesture Symbols") || "Gesture Symbols"
+        description: pluginApi?.tr("settings.desc", "Customize gesture display symbols (JSON format)") || "Customize gesture display symbols (JSON format)"
     }
 
     NTextInput {
         Layout.fillWidth: true
-        label: "JSON"
+        label: pluginApi?.tr("settings.json", "JSON") || "JSON"
         placeholderText: getDefaultJson()
         text: root.editSymbols || getDefaultJson()
         onTextChanged: root.editSymbols = text
@@ -46,14 +46,22 @@ ColumnLayout {
 
     RowLayout {
         NButton {
-            text: "Reset"
+            text: pluginApi?.tr("settings.copy", "Copy") || "Copy"
+            onClicked: {
+                // Copy current text to clipboard
+                Qt.application.clipboard.text = root.editSymbols || getDefaultJson();
+            }
+        }
+
+        NButton {
+            text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
             onClicked: {
                 root.editSymbols = getDefaultJson();
             }
         }
 
         NButton {
-            text: "Use Defaults"
+            text: pluginApi?.tr("settings.useDefault", "Use Defaults") || "Use Defaults"
             onClicked: {
                 root.editSymbols = "";
             }
@@ -65,7 +73,7 @@ ColumnLayout {
     }
 
     NLabel {
-        label: "Available Keys"
+        label: pluginApi?.tr("settings.keys", "Available Keys") || "Available Keys"
         description: "scroll, swipe3, swipe4, click, rightClick, middleClick, motion, pinchIn, pinchOut"
     }
 
@@ -82,7 +90,6 @@ ColumnLayout {
                 JSON.parse(root.editSymbols);
             } catch (e) {
                 Logger.e("Modifier Keys", "Invalid JSON:", e);
-                // Still save but log error
             }
         }
 

@@ -10,5 +10,12 @@
   "scroll": "滚动",
   "swipe3": "三指滑动",
   "swipe4": "四指滑动",
-  "pinch": "缩放"
+  "pinch": "缩放",
+  "settings.label": "手势符号",
+  "settings.desc": "自定义手势显示符号（JSON格式）",
+  "settings.json": "JSON",
+  "settings.reset": "重置",
+  "settings.copy": "复制",
+  "settings.useDefault": "使用默认",
+  "settings.keys": "可用键名"
 }
