@@ -7,7 +7,7 @@
 Noctalia Shell 插件项目，包含多个插件：
 - **developer-tools**: 开发者工具集合（时间戳转换、JSON 格式化）
 - **query-tracker**: Shell 命令执行结果监控器
-- **modifier-keys**: 键盘修饰键状态显示（Super、Alt、Ctrl、Shift）
+- **modifier-keys**: 键盘修饰键状态显示（Super、Alt、Ctrl、Shift）及触摸板手势识别
 
 ## 常用开发命令
 

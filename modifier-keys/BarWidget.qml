@@ -115,8 +115,8 @@ Item {
 
     // Gesture symbols (Nerd Fonts)
     // 方向: 左 上 右 下
-    readonly property var scrollSymbols: ["⮆", "⮇", "⮆", "⮅"] // ⇇⇈⇉⇊ ⮄ ⮆ ⮅ ⮇ 
-    readonly property var swipe3Symbols: ["🢂", "🢃", "🢀", "🢁"] // 󰛁󰛃󰛂󰛀 🢀 🢂 🢁 🢃
+    readonly property var scrollSymbols: ["⮆", "⮇", "⮄", "⮅"] // ⇇⇈⇉⇊ ⮄ ⮆ ⮅ ⮇ 
+    readonly property var swipe3Symbols: ["🡆", "🡇", "🡄", "🡅"] // 󰛁󰛃󰛂󰛀 🢀 🢂 🢁 🢃  🡄 🡆 🡅 🡇
     readonly property var swipe4Symbols: ["⭲", "⭳", "⭰", "⭱"] // 󰧘󰧜󰧚󰧖 ⭰ ⭲ ⭱ ⭳
     readonly property string clickSymbol: "󰳽 " // 󰳽 左键点击
     readonly property string rightClickSymbol: "󰳾" // 󰳾 右键点击
