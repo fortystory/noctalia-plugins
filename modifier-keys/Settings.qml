@@ -5,12 +5,15 @@ import qs.Widgets
 
 ColumnLayout {
     id: root
-    anchors.fill: parent
     spacing: Style.marginM
 
     property var pluginApi: null
 
-    property var cfg: pluginApi?.pluginSettings || ({})
+    // Local state
+    property string editSymbols:
+        pluginApi?.pluginSettings?.gestureSymbols ||
+        pluginApi?.manifest?.metadata?.defaultSettings?.gestureSymbols ||
+        ""
 
     readonly property var defaultGestureSymbols: {
         "scroll": ["⮆", "⮇", "⮄", "⮅"],
@@ -24,104 +27,67 @@ ColumnLayout {
         "pinchOut": "󰩮"
     }
 
-    function getGestureSymbols() {
-        const saved = cfg.gestureSymbols || "";
-        if (!saved || saved.trim() === "") return defaultGestureSymbols;
-        try {
-            const parsed = JSON.parse(saved);
-            var result = {};
-            for (var k in defaultGestureSymbols) result[k] = defaultGestureSymbols[k];
-            for (var k in parsed) result[k] = parsed[k];
-            return result;
-        } catch (e) {
-            return defaultGestureSymbols;
-        }
+    function getDefaultJson() {
+        return JSON.stringify(defaultGestureSymbols, null, 2);
     }
 
-    property string jsonText: JSON.stringify(getGestureSymbols(), null, 2)
-
-    // Title
-    Text {
-        text: "Gesture Symbols"
-        font.pixelSize: Style.fontSizeL || 18
-        font.bold: true
-        color: Style.textColor || "#FFFFFF"
+    NLabel {
+        label: "Gesture Symbols"
+        description: "Customize gesture display symbols (JSON format)"
     }
 
-    // Hint
-    Text {
-        text: "Paste JSON to customize symbols:"
-        font.pixelSize: Style.fontSizeS || 12
-        color: Style.textColorSecondary || "#AAAAAA"
+    NTextInput {
         Layout.fillWidth: true
-        wrapMode: Text.WordWrap
+        label: "JSON"
+        placeholderText: getDefaultJson()
+        text: root.editSymbols || getDefaultJson()
+        onTextChanged: root.editSymbols = text
     }
 
-    // JSON Editor - using Flickable
-    Rectangle {
-        Layout.fillWidth: true
-        Layout.fillHeight: true
-        Layout.minHeight: 150
-        color: Style.fillColorSecondary || "#2A2A2A"
-        radius: Style.radiusS || 4
-
-        Flickable {
-            anchors.fill: parent
-            anchors.margins: Style.marginS
-            contentWidth: editor.width
-            contentHeight: editor.height
-            clip: true
-
-            TextEdit {
-                id: editor
-                width: parent.width
-                wrapMode: TextEdit.Wrap
-                focus: true
-                readOnly: false
-                selectByMouse: true
-                font.family: "monospace"
-                font.pixelSize: Style.fontSizeS || 12
-                color: Style.textColor || "#FFFFFF"
-                text: root.jsonText
-            }
-        }
-    }
-
-    // Buttons
     RowLayout {
-        Layout.fillWidth: true
-
         NButton {
             text: "Reset"
             onClicked: {
-                editor.text = JSON.stringify(defaultGestureSymbols, null, 2);
+                root.editSymbols = getDefaultJson();
             }
         }
 
-        Item { Layout.fillWidth: true }
-
         NButton {
-            text: "Save"
+            text: "Use Defaults"
             onClicked: {
-                try {
-                    const parsed = JSON.parse(editor.text);
-                    if (!pluginApi.pluginSettings) pluginApi.pluginSettings = {};
-                    pluginApi.pluginSettings.gestureSymbols = JSON.stringify(parsed);
-                    pluginApi.saveSettings();
-                    saveLabel.text = "Saved!";
-                    saveLabel.color = "#4CAF50";
-                } catch (e) {
-                    saveLabel.text = "Invalid JSON";
-                    saveLabel.color = "#F44336";
-                }
+                root.editSymbols = "";
             }
         }
     }
 
-    Text {
-        id: saveLabel
-        text: ""
-        font.pixelSize: Style.fontSizeS || 12
-        color: "#4CAF50"
+    NDivider {
+        Layout.fillWidth: true
+    }
+
+    NLabel {
+        label: "Available Keys"
+        description: "scroll, swipe3, swipe4, click, rightClick, middleClick, motion, pinchIn, pinchOut"
+    }
+
+    // Save function - called by the dialog
+    function saveSettings() {
+        if (!pluginApi) {
+            Logger.e("Modifier Keys", "Cannot save: pluginApi is null");
+            return;
+        }
+
+        // Validate JSON if not empty
+        if (root.editSymbols && root.editSymbols.trim() !== "") {
+            try {
+                JSON.parse(root.editSymbols);
+            } catch (e) {
+                Logger.e("Modifier Keys", "Invalid JSON:", e);
+                // Still save but log error
+            }
+        }
+
+        pluginApi.pluginSettings.gestureSymbols = root.editSymbols;
+        pluginApi.saveSettings();
+        Logger.i("Modifier Keys", "Settings saved");
     }
 }
