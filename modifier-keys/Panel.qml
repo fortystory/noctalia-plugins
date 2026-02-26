@@ -11,7 +11,7 @@ Item {
 
     readonly property var geometryPlaceholder: panelContainer
     property real contentPreferredWidth: 280 * Style.uiScaleRatio
-    property real contentPreferredHeight: 600 * Style.uiScaleRatio
+    property real contentPreferredHeight: 400 * Style.uiScaleRatio
     readonly property bool allowAttach: true
 
     anchors.fill: parent
@@ -91,27 +91,27 @@ Item {
                 spacing: 4
 
                 RowLayout {
-                    NText { text: "󰆽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "󰆽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("motion", "Motion") || "Motion"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "󰳽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "󰳽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("click", "Click") || "Click"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "⮆ ⮇,⮄ ⮅"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "⮆ ⮇,⮄ ⮅"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("scroll", "Scroll") || "Scroll"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "🡆 🡇 🡄 🡅"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "🡆 🡇 🡄 🡅"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("swipe3", "3-Finger Swipe") || "3-Finger Swipe"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "⭲ ⭳ ⭰ ⭱"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "⭲ ⭳ ⭰ ⭱"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("swipe4", "4-Finger Swipe") || "4-Finger Swipe"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "󰘖 󰘕"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 48 }
+                    NText { text: "󰘖 󰘕"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 100 }
                     NText { text: pluginApi?.tr("pinch", "Pinch") || "Pinch"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
             }
