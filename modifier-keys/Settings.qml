@@ -57,24 +57,33 @@ ColumnLayout {
         wrapMode: Text.WordWrap
     }
 
-    // JSON Editor
-    ScrollView {
+    // JSON Editor - using Flickable
+    Rectangle {
         Layout.fillWidth: true
         Layout.fillHeight: true
         Layout.minHeight: 150
+        color: Style.fillColorSecondary || "#2A2A2A"
+        radius: Style.radiusS || 4
 
-        TextEdit {
-            id: textEdit
-            width: parent.width
-            wrapMode: TextEdit.Wrap
-            focus: true
-            readOnly: false
-            selectByMouse: true
-            selectByKeyboard: true
-            font.family: "monospace"
-            font.pixelSize: Style.fontSizeS || 12
-            color: Style.textColor || "#FFFFFF"
-            text: root.jsonText
+        Flickable {
+            anchors.fill: parent
+            anchors.margins: Style.marginS
+            contentWidth: editor.width
+            contentHeight: editor.height
+            clip: true
+
+            TextEdit {
+                id: editor
+                width: parent.width
+                wrapMode: TextEdit.Wrap
+                focus: true
+                readOnly: false
+                selectByMouse: true
+                font.family: "monospace"
+                font.pixelSize: Style.fontSizeS || 12
+                color: Style.textColor || "#FFFFFF"
+                text: root.jsonText
+            }
         }
     }
 
@@ -85,7 +94,7 @@ ColumnLayout {
         NButton {
             text: "Reset"
             onClicked: {
-                textEdit.text = JSON.stringify(defaultGestureSymbols, null, 2);
+                editor.text = JSON.stringify(defaultGestureSymbols, null, 2);
             }
         }
 
@@ -95,7 +104,7 @@ ColumnLayout {
             text: "Save"
             onClicked: {
                 try {
-                    const parsed = JSON.parse(textEdit.text);
+                    const parsed = JSON.parse(editor.text);
                     if (!pluginApi.pluginSettings) pluginApi.pluginSettings = {};
                     pluginApi.pluginSettings.gestureSymbols = JSON.stringify(parsed);
                     pluginApi.saveSettings();
