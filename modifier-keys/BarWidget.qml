@@ -26,8 +26,8 @@ Item {
         "rightClick": "󰳾",
         "middleClick": "󰻃",
         "motion": "󰆽",
-        "pinchIn": "󰩯",
-        "pinchOut": "󰩮"
+        "pinchIn": "󰘖",
+        "pinchOut": "󰘕"
     })
 
     // Load gesture symbols from settings
