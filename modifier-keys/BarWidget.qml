@@ -33,7 +33,8 @@ Item {
     // Load gesture symbols from settings
     function loadGestureSymbols() {
         if (!pluginApi) return defaultGestureSymbols;
-        const saved = pluginApi.getSetting("gestureSymbols", "");
+        const cfg = pluginApi.pluginSettings || {};
+        const saved = cfg.gestureSymbols || "";
         if (!saved || saved.trim() === "") return defaultGestureSymbols;
         try {
             const parsed = JSON.parse(saved);

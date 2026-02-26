@@ -21,9 +21,10 @@ ColumnLayout {
         "pinchOut": "󰩮"
     }
 
+    property var cfg: pluginApi?.pluginSettings || {}
+
     function getGestureSymbols() {
-        if (!pluginApi) return defaultGestureSymbols;
-        const saved = pluginApi.getSetting("gestureSymbols", "");
+        const saved = cfg.gestureSymbols || "";
         if (!saved || saved.trim() === "") return defaultGestureSymbols;
         try {
             const parsed = JSON.parse(saved);
@@ -100,11 +101,12 @@ ColumnLayout {
 
         NButton {
             text: pluginApi?.tr("settings.save", "Save") || "Save"
-            primary: true
             onClicked: {
                 try {
                     const parsed = JSON.parse(textEdit.text);
-                    pluginApi.setSetting("gestureSymbols", JSON.stringify(parsed));
+                    if (!pluginApi.pluginSettings) pluginApi.pluginSettings = {};
+                    pluginApi.pluginSettings.gestureSymbols = JSON.stringify(parsed);
+                    pluginApi.saveSettings();
                     toastText.text = pluginApi?.tr("settings.saved", "Saved!") || "Saved!";
                     toast.visible = true;
                     toastTimer.start();
