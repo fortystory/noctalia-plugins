@@ -462,12 +462,13 @@ Item {
     }
 
     function parseSwipeEvent(line) {
-        // Format: event14  GESTURE_SWIPE_BEGIN  +14.209s	3
-        //         event14  GESTURE_SWIPE_UPDATE  +14.220s	3  1.04/-8.99
-        //         event14  GESTURE_SWIPE_END     +14.434s	3
+        // Format: event14  GESTURE_SWIPE_BEGIN  +14.209s    3
+        //         event14  GESTURE_SWIPE_UPDATE  +14.220s    3  1.04/-8.99
+        //         event14  GESTURE_SWIPE_END     +14.434s    3
 
         if (line.includes("GESTURE_SWIPE_BEGIN")) {
-            const fingerMatch = line.match(/GESTURE_SWIPE_BEGIN\s+[\d.]+s\s+(\d)/);
+            // Match: GESTURE_SWIPE_BEGIN +0.033s    3
+            const fingerMatch = line.match(/GESTURE_SWIPE_BEGIN\s+\+[\d.]+s\s+(\d)/);
             if (fingerMatch) {
                 gestureFingerCount = parseInt(fingerMatch[1]);
                 gestureDeltaX = 0;
@@ -480,8 +481,8 @@ Item {
             gestureActive = true;
             gestureFading = false;
         } else if (line.includes("GESTURE_SWIPE_UPDATE")) {
-            // Extract delta: "3  1.04/-8.99"
-            const deltaMatch = line.match(/\d\s+(-?[\d.]+)\/(-?[\d.]+)/);
+            // Extract delta: "3  0.37/-5.50"
+            const deltaMatch = line.match(/\s\d\s+(-?[\d.]+)\/(-?[\d.]+)/);
             if (deltaMatch) {
                 gestureDeltaX += parseFloat(deltaMatch[1]);
                 gestureDeltaY += parseFloat(deltaMatch[2]);
