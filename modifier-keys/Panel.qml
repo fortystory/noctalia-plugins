@@ -11,7 +11,7 @@ Item {
 
     readonly property var geometryPlaceholder: panelContainer
     property real contentPreferredWidth: 280 * Style.uiScaleRatio
-    property real contentPreferredHeight: 400 * Style.uiScaleRatio
+    property real contentPreferredHeight: 350 * Style.uiScaleRatio
     readonly property bool allowAttach: true
 
     anchors.fill: parent

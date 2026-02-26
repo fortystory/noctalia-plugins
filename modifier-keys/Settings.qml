@@ -1,22 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.Commons
-import qs.Services.UI
 import qs.Widgets
 
-Item {
+ColumnLayout {
     id: root
+    spacing: Style.marginM
 
     property var pluginApi: null
 
-    readonly property var geometryPlaceholder: settingsContainer
-    property real contentPreferredWidth: 400 * Style.uiScaleRatio
-    property real contentPreferredHeight: 300 * Style.uiScaleRatio
-    readonly property bool allowAttach: true
-
-    anchors.fill: parent
-
-    // Default gesture symbols
     readonly property var defaultGestureSymbols: {
         "scroll": ["⮆", "⮇", "⮄", "⮅"],
         "swipe3": ["🡆", "🡇", "🡄", "🡅"],
@@ -44,94 +36,108 @@ Item {
         }
     }
 
+    property string jsonText: JSON.stringify(getGestureSymbols(), null, 2)
+
+    // Title
+    Text {
+        text: pluginApi?.tr("settings.title", "Gesture Symbols") || "Gesture Symbols"
+        font.pixelSize: Style.fontSizeL || 18
+        font.bold: true
+        color: Style.textColor || "#FFFFFF"
+    }
+
+    // Hint
+    Text {
+        text: pluginApi?.tr("settings.hint", "Paste JSON to customize symbols:") || "Paste JSON to customize symbols:"
+        font.pixelSize: Style.fontSizeS || 12
+        color: Style.textColorSecondary || "#AAAAAA"
+        Layout.fillWidth: true
+        wrapMode: Text.WordWrap
+    }
+
+    // JSON Editor
     Rectangle {
-        id: settingsContainer
-        anchors.fill: parent
-        color: "transparent"
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        color: Style.fillColorSecondary || "#2A2A2A"
+        radius: Style.radiusS || 4
 
-        ColumnLayout {
+        Flickable {
+            id: flickable
             anchors.fill: parent
-            anchors.margins: Style.marginM
-            spacing: Style.marginM
+            anchors.margins: Style.marginS
+            contentWidth: textEdit.contentWidth
+            contentHeight: textEdit.contentHeight
+            clip: true
 
-            NText {
-                text: pluginApi?.tr("settings.title", "Gesture Symbols Settings") || "Gesture Symbols Settings"
-                pointSize: Style.fontSizeL
-                font.bold: true
-                color: Color.mOnSurface
+            TextEdit {
+                id: textEdit
+                width: flickable.width - Style.marginS * 2
+                wrapMode: TextEdit.Wrap
+                selectByMouse: true
+                font.family: "monospace"
+                font.pixelSize: Style.fontSizeS || 12
+                color: Style.textColor || "#FFFFFF"
+                text: root.jsonText
+                onTextChanged: root.jsonText = text
             }
+        }
+    }
 
-            NText {
-                text: pluginApi?.tr("settings.hint", "Paste JSON to customize gesture symbols:") || "Paste JSON to customize gesture symbols:"
-                pointSize: Style.fontSizeS
-                color: Color.mOnSurfaceVariant
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-            }
+    // Buttons
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: Style.marginM
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                color: Color.mSurfaceContainer
-                radius: Style.radiusS
-                border.color: Color.mOutlineVariant
-                border.width: 1
-
-                Flickable {
-                    id: flickable
-                    anchors.fill: parent
-                    anchors.margins: Style.marginS
-                    contentWidth: textEdit.width
-                    contentHeight: textEdit.height
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    TextEdit {
-                        id: textEdit
-                        width: flickable.width - Style.marginS * 2
-                        wrapMode: TextEdit.Wrap
-                        selectByMouse: true
-                        font.family: "monospace"
-                        font.pointSize: Style.fontSizeS
-                        color: Color.mOnSurface
-                        text: JSON.stringify(getGestureSymbols(), null, 2)
-                    }
-                }
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Style.marginS
-
-                NButton {
-                    text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
-                    onClicked: {
-                        textEdit.text = JSON.stringify(defaultGestureSymbols, null, 2);
-                    }
-                }
-
-                Item { Layout.fillWidth: true }
-
-                NButton {
-                    text: pluginApi?.tr("settings.save", "Save") || "Save"
-                    primary: true
-                    onClicked: {
-                        try {
-                            const parsed = JSON.parse(textEdit.text);
-                            pluginApi.setSetting("gestureSymbols", JSON.stringify(parsed));
-                            toast.show(pluginApi?.tr("settings.saved", "Saved!") || "Saved!");
-                        } catch (e) {
-                            toast.show(pluginApi?.tr("settings.invalid", "Invalid JSON") || "Invalid JSON");
-                        }
-                    }
-                }
+        NButton {
+            text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
+            onClicked: {
+                textEdit.text = JSON.stringify(defaultGestureSymbols, null, 2);
             }
         }
 
-        NToast {
-            id: toast
-            anchors.bottom: parent.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
+        Item { Layout.fillWidth: true }
+
+        NButton {
+            text: pluginApi?.tr("settings.save", "Save") || "Save"
+            primary: true
+            onClicked: {
+                try {
+                    const parsed = JSON.parse(textEdit.text);
+                    pluginApi.setSetting("gestureSymbols", JSON.stringify(parsed));
+                    toastText.text = pluginApi?.tr("settings.saved", "Saved!") || "Saved!";
+                    toast.visible = true;
+                    toastTimer.start();
+                } catch (e) {
+                    toastText.text = pluginApi?.tr("settings.invalid", "Invalid JSON") || "Invalid JSON";
+                    toast.visible = true;
+                    toastTimer.start();
+                }
+            }
         }
+    }
+
+    // Toast
+    Rectangle {
+        id: toast
+        visible: false
+        color: Style.accentColor || "#4CAF50"
+        radius: Style.radiusS || 4
+        padding: Style.marginS || 8
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        Text {
+            id: toastText
+            text: ""
+            color: "#FFFFFF"
+            font.pixelSize: Style.fontSizeS || 12
+        }
+    }
+
+    Timer {
+        id: toastTimer
+        interval: 1500
+        onTriggered: toast.visible = false
     }
 }
