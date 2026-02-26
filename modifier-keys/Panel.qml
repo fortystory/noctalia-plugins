@@ -11,7 +11,7 @@ Item {
 
     readonly property var geometryPlaceholder: panelContainer
     property real contentPreferredWidth: 280 * Style.uiScaleRatio
-    property real contentPreferredHeight: 200 * Style.uiScaleRatio
+    property real contentPreferredHeight: 280 * Style.uiScaleRatio
     readonly property bool allowAttach: true
 
     anchors.fill: parent
@@ -24,7 +24,7 @@ Item {
         ColumnLayout {
             anchors.fill: parent
             anchors.margins: Style.marginM
-            spacing: Style.marginM
+            spacing: Style.marginS
 
             // Title
             NText {
@@ -75,8 +75,77 @@ Item {
                 }
             }
 
+            NDivider {
+                Layout.fillWidth: true
+            }
+
+            // Gesture legend
+            NText {
+                text: pluginApi?.tr("gestures", "Gestures") || "Gestures"
+                pointSize: Style.fontSizeM
+                font.bold: true
+                color: Color.mOnSurface
+            }
+
+            ColumnLayout {
+                spacing: 4
+
+                RowLayout {
+                    NText { text: "󰆽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("motion", "Motion") || "Motion"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+                RowLayout {
+                    NText { text: "󰳽"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("click", "Click") || "Click"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+                RowLayout {
+                    NText { text: "⮆⮇"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("scroll", "Scroll") || "Scroll"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+                RowLayout {
+                    NText { text: "🡆🡇"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("swipe3", "3-Finger Swipe") || "3-Finger Swipe"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+                RowLayout {
+                    NText { text: "⭰⭱"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("swipe4", "4-Finger Swipe") || "4-Finger Swipe"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+                RowLayout {
+                    NText { text: "󰩮󰩯"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 24 }
+                    NText { text: pluginApi?.tr("pinch", "Pinch") || "Pinch"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
+                }
+            }
+
             Item {
                 Layout.fillHeight: true
+            }
+
+            // Settings button
+            NButton {
+                text: pluginApi?.tr("settings", "Symbol Settings") || "Symbol Settings"
+                Layout.fillWidth: true
+                onClicked: {
+                    try {
+                        pluginApi.openSettings(root.screen, root);
+                    } catch (e) {
+                        try {
+                            pluginApi.openSettings(screen);
+                        } catch (err) {
+                            // Fallback: try to open settings via panel
+                            Logger.d("Modifier Keys", "Settings not available");
+                        }
+                    }
+                }
+            }
+
+            // Hint
+            NText {
+                text: pluginApi?.tr("hint", "Right-click bar widget to open settings") || "Right-click bar widget to open settings"
+                pointSize: Style.fontSizeXS
+                color: Color.mOnSurfaceVariant
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
             }
         }
     }

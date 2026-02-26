@@ -3,5 +3,14 @@
   "super": "Super (Win键)",
   "alt": "Alt",
   "ctrl": "Ctrl",
-  "shift": "Shift"
+  "shift": "Shift",
+  "gestures": "手势",
+  "motion": "移动",
+  "click": "点击",
+  "scroll": "滚动",
+  "swipe3": "三指滑动",
+  "swipe4": "四指滑动",
+  "pinch": "缩放",
+  "settings": "符号设置",
+  "hint": "右键状态栏图标打开设置"
 }
