@@ -9,11 +9,21 @@ ColumnLayout {
 
     property var pluginApi: null
 
-    // Local state
-    property string editSymbols:
-        pluginApi?.pluginSettings?.gestureSymbols ||
-        pluginApi?.manifest?.metadata?.defaultSettings?.gestureSymbols ||
-        ""
+    // Use function to safely get settings
+    function getEditSymbols() {
+        if (!pluginApi) return "";
+        var settings = pluginApi.pluginSettings;
+        if (settings && settings.gestureSymbols) return settings.gestureSymbols;
+        var defaults = pluginApi.manifest?.metadata?.defaultSettings;
+        if (defaults && defaults.gestureSymbols) return defaults.gestureSymbols;
+        return "";
+    }
+
+    function setEditSymbols(value) {
+        if (!pluginApi) return;
+        if (!pluginApi.pluginSettings) pluginApi.pluginSettings = {};
+        pluginApi.pluginSettings.gestureSymbols = value;
+    }
 
     readonly property var defaultGestureSymbols: {
         "scroll": ["⮆", "⮇", "⮄", "⮅"],
@@ -31,39 +41,52 @@ ColumnLayout {
         return JSON.stringify(defaultGestureSymbols, null, 2);
     }
 
+    function getCurrentJson() {
+        var saved = getEditSymbols();
+        if (saved && saved.toString().trim() !== "") {
+            return saved;
+        }
+        return getDefaultJson();
+    }
+
     NLabel {
-        label: pluginApi?.tr("settings.label", "Gesture Symbols") || "Gesture Symbols"
-        description: pluginApi?.tr("settings.desc", "Customize gesture display symbols (JSON format)") || "Customize gesture display symbols (JSON format)"
+        label: qsTr("Gesture Symbols")
+        description: qsTr("Customize gesture display symbols (JSON format)")
     }
 
     NTextInput {
+        id: jsonInput
         Layout.fillWidth: true
-        label: pluginApi?.tr("settings.json", "JSON") || "JSON"
+        label: qsTr("JSON")
         placeholderText: getDefaultJson()
-        text: root.editSymbols || getDefaultJson()
-        onTextChanged: root.editSymbols = text
+        text: getCurrentJson()
+        onTextChanged: setEditSymbols(text)
     }
 
     RowLayout {
         NButton {
-            text: pluginApi?.tr("settings.copy", "Copy") || "Copy"
+            text: qsTr("Copy")
             onClicked: {
-                // Copy current text to clipboard
-                Qt.application.clipboard.text = root.editSymbols || getDefaultJson();
+                var textToCopy = jsonInput.text || getDefaultJson();
+                if (pluginApi && typeof pluginApi.copyToClipboard === "function") {
+                    pluginApi.copyToClipboard(textToCopy);
+                }
             }
         }
 
         NButton {
-            text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
+            text: qsTr("Reset")
             onClicked: {
-                root.editSymbols = getDefaultJson();
+                setEditSymbols(getDefaultJson());
+                jsonInput.text = getDefaultJson();
             }
         }
 
         NButton {
-            text: pluginApi?.tr("settings.useDefault", "Use Defaults") || "Use Defaults"
+            text: qsTr("Use Defaults")
             onClicked: {
-                root.editSymbols = "";
+                setEditSymbols("");
+                jsonInput.text = getDefaultJson();
             }
         }
     }
@@ -73,7 +96,7 @@ ColumnLayout {
     }
 
     NLabel {
-        label: pluginApi?.tr("settings.keys", "Available Keys") || "Available Keys"
+        label: qsTr("Available Keys")
         description: "scroll, swipe3, swipe4, click, rightClick, middleClick, motion, pinchIn, pinchOut"
     }
 
@@ -84,16 +107,17 @@ ColumnLayout {
             return;
         }
 
+        var jsonStr = jsonInput.text || getDefaultJson();
         // Validate JSON if not empty
-        if (root.editSymbols && root.editSymbols.trim() !== "") {
+        if (jsonStr && jsonStr.toString().trim() !== "") {
             try {
-                JSON.parse(root.editSymbols);
+                JSON.parse(jsonStr);
             } catch (e) {
                 Logger.e("Modifier Keys", "Invalid JSON:", e);
             }
         }
 
-        pluginApi.pluginSettings.gestureSymbols = root.editSymbols;
+        setEditSymbols(jsonStr);
         pluginApi.saveSettings();
         Logger.i("Modifier Keys", "Settings saved");
     }
