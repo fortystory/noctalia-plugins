@@ -10,7 +10,5 @@
   "scroll": "Scroll",
   "swipe3": "3-Finger Swipe",
   "swipe4": "4-Finger Swipe",
-  "pinch": "Pinch",
-  "settings": "Symbol Settings",
-  "hint": "Right-click bar widget to open settings"
+  "pinch": "Pinch"
 }

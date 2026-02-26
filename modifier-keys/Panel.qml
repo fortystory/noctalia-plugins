@@ -119,34 +119,6 @@ Item {
             Item {
                 Layout.fillHeight: true
             }
-
-            // Settings button
-            NButton {
-                text: pluginApi?.tr("settings", "Symbol Settings") || "Symbol Settings"
-                Layout.fillWidth: true
-                onClicked: {
-                    try {
-                        pluginApi.openSettings(root.screen, root);
-                    } catch (e) {
-                        try {
-                            pluginApi.openSettings(screen);
-                        } catch (err) {
-                            // Fallback: try to open settings via panel
-                            Logger.d("Modifier Keys", "Settings not available");
-                        }
-                    }
-                }
-            }
-
-            // Hint
-            NText {
-                text: pluginApi?.tr("hint", "Right-click bar widget to open settings") || "Right-click bar widget to open settings"
-                pointSize: Style.fontSizeXS
-                color: Color.mOnSurfaceVariant
-                Layout.fillWidth: true
-                wrapMode: Text.WordWrap
-                horizontalAlignment: Text.AlignHCenter
-            }
         }
     }
 }
