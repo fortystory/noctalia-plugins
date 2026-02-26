@@ -26,13 +26,13 @@
     {
       "id": "modifier-keys",
       "name": "Modifier Keys",
-      "version": "1.0.9",
+      "version": "1.1.0",
       "author": "forty",
-      "description": "Display keyboard modifier keys status (Ctrl, Alt, Super, Shift) in the status bar",
+      "description": "Display keyboard modifier keys status and trackpad gestures in the status bar",
       "repository": "https://github.com/fortystory/noctalia-plugins",
       "minNoctaliaVersion": "3.6.0",
       "license": "MIT",
-      "lastUpdated": "2026-02-25T00:00:00+00:00"
+      "lastUpdated": "2026-02-26T00:00:00+00:00"
     }
   ]
 }

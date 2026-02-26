@@ -103,6 +103,29 @@ Item {
     property bool altFading: false
     property bool superFading: false
 
+    // Trackpad gesture state
+    property string gestureSymbol: ""
+    property bool gestureActive: false
+    property bool gestureFading: false
+
+    // 累计滚动/滑动距离（用于判断方向）
+    property real gestureDeltaX: 0
+    property real gestureDeltaY: 0
+    property int gestureFingerCount: 0
+
+    // Gesture symbols (Nerd Fonts)
+    // 方向: 左 上 右 下
+    readonly property var scrollSymbols: ["⇇", "⇈", "⇉", "⇊"] // ⇇⇈⇉⇊
+    readonly property var swipe3Symbols: ["󰛁", "󰛃", "󰛂", "󰛀"] // 󰛁󰛃󰛂󰛀
+    readonly property var swipe4Symbols: ["󰧘", "󰧜", "󰧚", "󰧖"] // 󰧘󰧜󰧚󰧖
+    readonly property string clickSymbol: "󰳽 " // 󰳽 左键点击
+    readonly property string rightClickSymbol: "󰳾" // 󰳾 右键点击
+    readonly property string middleClickSymbol: "󰻃" // 󰻃 中键点击
+    readonly property string motionSymbol: "󰆽" // 󰆽 光标移动
+
+    // 光标移动状态
+    property bool motionActive: false
+
     // Add key to pressed keys list
     function addKey(keyName) {
         // Don't add modifier keys to the list
@@ -196,6 +219,29 @@ Item {
         }
     }
 
+    // Timer for gesture fade delay
+    Timer {
+        id: gestureFadeTimer
+        interval: 500
+        onTriggered: {
+            gestureSymbol = "";
+            gestureFading = false;
+            gestureActive = false;
+            gestureDeltaX = 0;
+            gestureDeltaY = 0;
+            gestureFingerCount = 0;
+        }
+    }
+
+    // Timer for motion fade delay
+    Timer {
+        id: motionFadeTimer
+        interval: 200
+        onTriggered: {
+            motionActive = false;
+        }
+    }
+
     // Process to monitor keyboard events via libinput
     Process {
         id: keyboardMonitor
@@ -227,11 +273,31 @@ Item {
     }
 
     function parseLibinputLine(line) {
+        // Skip kernel bug warnings
+        if (line.includes("kernel bug") || line.includes("Touch jump detected")) return;
+
+        // Handle keyboard events
+        if (line.includes("KEYBOARD_KEY")) {
+            parseKeyboardEvent(line);
+            return;
+        }
+
+        // Handle trackpad events
+        if (line.includes("POINTER_BUTTON")) {
+            parsePointerButton(line);
+        } else if (line.includes("POINTER_SCROLL_FINGER")) {
+            parseScrollEvent(line);
+        } else if (line.includes("GESTURE_SWIPE")) {
+            parseSwipeEvent(line);
+        } else if (line.includes("POINTER_MOTION")) {
+            parseMotionEvent(line);
+        }
+    }
+
+    function parseKeyboardEvent(line) {
         // libinput debug-events output format:
         // event4   KEYBOARD_KEY    +2.15s	KEY_LEFTSHIFT (42) pressed
         // event4   KEYBOARD_KEY    +2.18s	KEY_LEFTSHIFT (42) released
-
-        if (!line.includes("KEYBOARD_KEY")) return;
 
         const isPressed = line.includes("pressed");
         const isReleased = line.includes("released");
@@ -317,6 +383,152 @@ Item {
         }
     }
 
+    function parsePointerButton(line) {
+        // Format: event14  POINTER_BUTTON  +6.772s	BTN_LEFT (272) pressed
+        const buttonMatch = line.match(/BTN_(\w+)\s*\(/);
+        if (!buttonMatch) return;
+
+        const button = buttonMatch[1];
+        const isPressed = line.includes("pressed");
+
+        if (isPressed) {
+            // Clear keyboard display when showing gesture
+            displayKeys = [];
+            fadeTimer.stop();
+
+            if (button === "LEFT") {
+                gestureSymbol = clickSymbol;
+            } else if (button === "RIGHT") {
+                gestureSymbol = rightClickSymbol;
+            } else if (button === "MIDDLE") {
+                gestureSymbol = middleClickSymbol;
+            }
+            gestureActive = true;
+            gestureFading = false;
+            gestureFadeTimer.stop();
+        } else {
+            // Button released - start fade
+            gestureActive = false;
+            gestureFading = true;
+            gestureFadeTimer.stop();
+            gestureFadeTimer.start();
+        }
+    }
+
+    function parseScrollEvent(line) {
+        // Format: event14  POINTER_SCROLL_FINGER  +2.104s	vert 0.00/0.0 horiz -8.73/0.0* (finger)
+        const vertMatch = line.match(/vert\s+(-?[\d.]+)\//);
+        const horizMatch = line.match(/horiz\s+(-?[\d.]+)\//);
+
+        if (!vertMatch || !horizMatch) return;
+
+        const vert = parseFloat(vertMatch[1]);
+        const horiz = parseFloat(horizMatch[1]);
+
+        // Accumulate delta
+        gestureDeltaX += horiz;
+        gestureDeltaY += vert;
+
+        // Clear keyboard display
+        displayKeys = [];
+        fadeTimer.stop();
+
+        // Determine direction based on accumulated delta
+        const threshold = 15;
+        let direction = -1;
+
+        if (Math.abs(gestureDeltaX) > threshold || Math.abs(gestureDeltaY) > threshold) {
+            if (Math.abs(gestureDeltaX) > Math.abs(gestureDeltaY)) {
+                direction = gestureDeltaX > 0 ? 2 : 0; // right : left
+            } else {
+                direction = gestureDeltaY > 0 ? 1 : 3; // up : down
+            }
+
+            gestureSymbol = scrollSymbols[direction];
+            gestureActive = true;
+            gestureFading = false;
+            gestureFadeTimer.stop();
+        }
+
+        // Check if scroll ended (near zero values)
+        if (Math.abs(vert) < 0.5 && Math.abs(horiz) < 0.5 && (Math.abs(gestureDeltaX) > 5 || Math.abs(gestureDeltaY) > 5)) {
+            gestureActive = false;
+            gestureFading = true;
+            gestureFadeTimer.stop();
+            gestureFadeTimer.start();
+            gestureDeltaX = 0;
+            gestureDeltaY = 0;
+        }
+    }
+
+    function parseSwipeEvent(line) {
+        // Format: event14  GESTURE_SWIPE_BEGIN  +14.209s	3
+        //         event14  GESTURE_SWIPE_UPDATE  +14.220s	3  1.04/-8.99
+        //         event14  GESTURE_SWIPE_END     +14.434s	3
+
+        if (line.includes("GESTURE_SWIPE_BEGIN")) {
+            const fingerMatch = line.match(/GESTURE_SWIPE_BEGIN\s+[\d.]+s\s+(\d)/);
+            if (fingerMatch) {
+                gestureFingerCount = parseInt(fingerMatch[1]);
+                gestureDeltaX = 0;
+                gestureDeltaY = 0;
+            }
+            // Clear keyboard display
+            displayKeys = [];
+            fadeTimer.stop();
+            gestureFadeTimer.stop();
+            gestureActive = true;
+            gestureFading = false;
+        } else if (line.includes("GESTURE_SWIPE_UPDATE")) {
+            // Extract delta: "3  1.04/-8.99"
+            const deltaMatch = line.match(/\d\s+(-?[\d.]+)\/(-?[\d.]+)/);
+            if (deltaMatch) {
+                gestureDeltaX += parseFloat(deltaMatch[1]);
+                gestureDeltaY += parseFloat(deltaMatch[2]);
+            }
+
+            // Determine direction
+            const threshold = 20;
+            let direction = -1;
+
+            if (Math.abs(gestureDeltaX) > threshold || Math.abs(gestureDeltaY) > threshold) {
+                if (Math.abs(gestureDeltaX) > Math.abs(gestureDeltaY)) {
+                    direction = gestureDeltaX > 0 ? 2 : 0; // right : left
+                } else {
+                    direction = gestureDeltaY > 0 ? 1 : 3; // up : down
+                }
+
+                if (gestureFingerCount === 3) {
+                    gestureSymbol = swipe3Symbols[direction];
+                } else if (gestureFingerCount === 4) {
+                    gestureSymbol = swipe4Symbols[direction];
+                }
+            }
+        } else if (line.includes("GESTURE_SWIPE_END")) {
+            gestureActive = false;
+            gestureFading = true;
+            gestureFadeTimer.stop();
+            gestureFadeTimer.start();
+            gestureDeltaX = 0;
+            gestureDeltaY = 0;
+            gestureFingerCount = 0;
+        }
+    }
+
+    function parseMotionEvent(line) {
+        // Format: event14  POINTER_MOTION  +0.011s	  6.77/ -1.28 (+34.00/ -6.41)
+        // 单指滑动移动光标
+        if (gestureActive) return; // 如果正在进行其他手势，忽略
+
+        // Clear keyboard display
+        displayKeys = [];
+        fadeTimer.stop();
+
+        motionActive = true;
+        motionFadeTimer.stop();
+        motionFadeTimer.start();
+    }
+
     Rectangle {
         id: visualCapsule
         x: Style.pixelAlignCenter(parent.width, width)
@@ -381,7 +593,7 @@ Item {
                 Behavior on opacity { NumberAnimation { duration: 100 } }
             }
 
-            // Normal keys display (max 1) - always show 1 placeholder slot
+            // Normal keys / Gesture display (max 1) - always show 1 placeholder slot
             RowLayout {
                 id: normalKeysRow
                 spacing: 0
@@ -393,11 +605,15 @@ Item {
                     width: 16
                     NText {
                         anchors.centerIn: parent
-                        text: displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""
+                        // 优先显示手势，其次光标移动，最后显示按键
+                        text: gestureSymbol.length > 0 ? gestureSymbol :
+                              (motionActive ? motionSymbol :
+                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""))
                         pointSize: Style.barFontSize - 1
-                        color: displayKeys.length > 0 ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: displayKeys.length > 0
-                        opacity: displayKeys.length > 0 ? (isFading ? 0.6 : 1.0) : 0.2
+                        color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
+                        font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
+                        opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
+                                  ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
                     }
                 }
             }
