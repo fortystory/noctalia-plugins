@@ -35,7 +35,10 @@ Item {
         if (!saved || saved.trim() === "") return defaultGestureSymbols;
         try {
             const parsed = JSON.parse(saved);
-            return { ...defaultGestureSymbols, ...parsed };
+            var result = {};
+            for (var k in defaultGestureSymbols) result[k] = defaultGestureSymbols[k];
+            for (var k in parsed) result[k] = parsed[k];
+            return result;
         } catch (e) {
             return defaultGestureSymbols;
         }
