@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.Commons
 import qs.Widgets
 
@@ -50,14 +51,14 @@ ColumnLayout {
     }
 
     NLabel {
-        label: qsTr("Gesture Symbols")
-        description: qsTr("Customize gesture display symbols (JSON format)")
+        label: pluginApi?.tr("settings.label", "Gesture Symbols") || "Gesture Symbols"
+        description: pluginApi?.tr("settings.desc", "Customize gesture display symbols (JSON format)") || "Customize gesture display symbols (JSON format)"
     }
 
     NTextInput {
         id: jsonInput
         Layout.fillWidth: true
-        label: qsTr("JSON")
+        label: pluginApi?.tr("settings.json", "JSON") || "JSON"
         placeholderText: getDefaultJson()
         text: getCurrentJson()
         onTextChanged: setEditSymbols(text)
@@ -65,17 +66,15 @@ ColumnLayout {
 
     RowLayout {
         NButton {
-            text: qsTr("Copy")
+            text: pluginApi?.tr("settings.copy", "Copy") || "Copy"
             onClicked: {
                 var textToCopy = jsonInput.text || getDefaultJson();
-                if (pluginApi && typeof pluginApi.copyToClipboard === "function") {
-                    pluginApi.copyToClipboard(textToCopy);
-                }
+                Quickshell.clipboardText = textToCopy;
             }
         }
 
         NButton {
-            text: qsTr("Reset")
+            text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
             onClicked: {
                 setEditSymbols(getDefaultJson());
                 jsonInput.text = getDefaultJson();
@@ -83,7 +82,7 @@ ColumnLayout {
         }
 
         NButton {
-            text: qsTr("Use Defaults")
+            text: pluginApi?.tr("settings.useDefault", "Use Defaults") || "Use Defaults"
             onClicked: {
                 setEditSymbols("");
                 jsonInput.text = getDefaultJson();

@@ -1,6 +1,6 @@
 {
   "title": "修饰键",
-  "super": "Super (Win键)",
+  "super": "Super (Win 键)",
   "alt": "Alt",
   "ctrl": "Ctrl",
   "shift": "Shift",
@@ -11,11 +11,13 @@
   "swipe3": "三指滑动",
   "swipe4": "四指滑动",
   "pinch": "缩放",
-  "settings.label": "手势符号",
-  "settings.desc": "自定义手势显示符号（JSON格式）",
-  "settings.json": "JSON",
-  "settings.reset": "重置",
-  "settings.copy": "复制",
-  "settings.useDefault": "使用默认",
-  "settings.keys": "可用键名"
+  "settings": {
+    "label": "手势符号",
+    "desc": "自定义手势显示符号（JSON 格式）",
+    "json": "JSON",
+    "reset": "重置",
+    "copy": "复制",
+    "useDefault": "使用默认",
+    "keys": "可用键名"
+  }
 }

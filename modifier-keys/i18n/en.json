@@ -11,11 +11,13 @@
   "swipe3": "3-Finger Swipe",
   "swipe4": "4-Finger Swipe",
   "pinch": "Pinch",
-  "settings.label": "Gesture Symbols",
-  "settings.desc": "Customize gesture display symbols (JSON format)",
-  "settings.json": "JSON",
-  "settings.reset": "Reset",
-  "settings.copy": "Copy",
-  "settings.useDefault": "Use Defaults",
-  "settings.keys": "Available Keys"
+  "settings": {
+    "label": "Gesture Symbols",
+    "desc": "Customize gesture display symbols (JSON format)",
+    "json": "JSON",
+    "reset": "Reset",
+    "copy": "Copy",
+    "useDefault": "Use Defaults",
+    "keys": "Available Keys"
+  }
 }
