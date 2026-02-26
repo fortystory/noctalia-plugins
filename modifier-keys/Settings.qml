@@ -58,23 +58,23 @@ ColumnLayout {
     }
 
     // JSON Editor
-    Rectangle {
+    ScrollView {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        color: Style.fillColorSecondary || "#2A2A2A"
-        radius: Style.radiusS || 4
+        Layout.minHeight: 150
 
         TextEdit {
             id: textEdit
-            anchors.fill: parent
-            anchors.margins: Style.marginS
+            width: parent.width
             wrapMode: TextEdit.Wrap
+            focus: true
+            readOnly: false
             selectByMouse: true
+            selectByKeyboard: true
             font.family: "monospace"
             font.pixelSize: Style.fontSizeS || 12
             color: Style.textColor || "#FFFFFF"
             text: root.jsonText
-            onTextChanged: root.jsonText = text
         }
     }
 
