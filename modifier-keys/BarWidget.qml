@@ -115,9 +115,9 @@ Item {
 
     // Gesture symbols (Nerd Fonts)
     // 方向: 左 上 右 下
-    readonly property var scrollSymbols: ["⇇", "⇈", "⇉", "⇊"] // ⇇⇈⇉⇊
-    readonly property var swipe3Symbols: ["󰛁", "󰛃", "󰛂", "󰛀"] // 󰛁󰛃󰛂󰛀
-    readonly property var swipe4Symbols: ["󰧘", "󰧜", "󰧚", "󰧖"] // 󰧘󰧜󰧚󰧖
+    readonly property var scrollSymbols: ["⮆", "⮇", "⮆", "⮅"] // ⇇⇈⇉⇊ ⮄ ⮆ ⮅ ⮇ 
+    readonly property var swipe3Symbols: ["🢂", "🢃", "🢀", "🢁"] // 󰛁󰛃󰛂󰛀 🢀 🢂 🢁 🢃
+    readonly property var swipe4Symbols: ["⭲", "⭳", "⭰", "⭱"] // 󰧘󰧜󰧚󰧖 ⭰ ⭲ ⭱ ⭳
     readonly property string clickSymbol: "󰳽 " // 󰳽 左键点击
     readonly property string rightClickSymbol: "󰳾" // 󰳾 右键点击
     readonly property string middleClickSymbol: "󰻃" // 󰻃 中键点击
@@ -392,8 +392,13 @@ Item {
         const isPressed = line.includes("pressed");
 
         if (isPressed) {
-            // Clear keyboard display when showing gesture
+            // Clear keyboard display and combo states when showing gesture
             displayKeys = [];
+            isFading = false;
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
             fadeTimer.stop();
 
             if (button === "LEFT") {
@@ -425,13 +430,23 @@ Item {
         const vert = parseFloat(vertMatch[1]);
         const horiz = parseFloat(horizMatch[1]);
 
+        // Check if this is the start of a new scroll gesture
+        const isNewGesture = (gestureDeltaX === 0 && gestureDeltaY === 0 && !gestureActive);
+
         // Accumulate delta
         gestureDeltaX += horiz;
         gestureDeltaY += vert;
 
-        // Clear keyboard display
-        displayKeys = [];
-        fadeTimer.stop();
+        // Clear keyboard display and combo states when starting a new gesture
+        if (isNewGesture) {
+            displayKeys = [];
+            isFading = false;
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
+            fadeTimer.stop();
+        }
 
         // Determine direction based on accumulated delta
         const threshold = 15;
@@ -474,8 +489,13 @@ Item {
                 gestureDeltaX = 0;
                 gestureDeltaY = 0;
             }
-            // Clear keyboard display
+            // Clear keyboard display and combo states when starting gesture
             displayKeys = [];
+            isFading = false;
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
             fadeTimer.stop();
             gestureFadeTimer.stop();
             gestureActive = true;
@@ -521,9 +541,19 @@ Item {
         // 单指滑动移动光标
         if (gestureActive) return; // 如果正在进行其他手势，忽略
 
-        // Clear keyboard display
-        displayKeys = [];
-        fadeTimer.stop();
+        // Check if this is the start of a new motion
+        const isNewMotion = !motionActive;
+
+        // Clear keyboard display and combo states when starting a new motion
+        if (isNewMotion) {
+            displayKeys = [];
+            isFading = false;
+            shiftInCombo = false;
+            ctrlInCombo = false;
+            altInCombo = false;
+            superInCombo = false;
+            fadeTimer.stop();
+        }
 
         motionActive = true;
         motionFadeTimer.stop();
