@@ -91,8 +91,8 @@ Item {
     readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS
     readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS
 
-    readonly property real contentWidth: Math.max(28, isVertical ? Style.capsuleHeight : visualContentWidth)
-    readonly property real contentHeight: Math.max(28, isVertical ? visualContentHeight : Style.capsuleHeight)
+    readonly property real contentWidth: Math.max(24, isVertical ? Style.capsuleHeight : visualContentWidth)
+    readonly property real contentHeight: Math.max(24, isVertical ? visualContentHeight : Style.capsuleHeight)
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
