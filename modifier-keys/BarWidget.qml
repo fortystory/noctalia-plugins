@@ -106,8 +106,8 @@ Item {
     readonly property real visualContentWidth: layoutLoader.item ? (root.isVertical ? layoutLoader.item.children[0]?.implicitWidth || 24 : layoutLoader.item.implicitWidth) + Style.marginM : 24
     readonly property real visualContentHeight: layoutLoader.item ? (root.isVertical ? layoutLoader.item.implicitHeight : layoutLoader.item.children[0]?.implicitHeight || 24) + Style.marginM : 24
 
-    readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
-    readonly property real contentHeight: Math.max(24, isVertical ? visualContentHeight : Style.capsuleHeight)
+    readonly property real contentWidth: isVertical ? Math.max(Style.capsuleHeight, visualContentWidth) : visualContentWidth
+    readonly property real contentHeight: isVertical ? visualContentHeight : Math.max(Style.capsuleHeight, visualContentHeight)
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
@@ -577,6 +577,7 @@ Item {
                     Item {
                         width: 16
                         height: 16
+                        Layout.alignment: Qt.AlignHCenter
                         NText {
                             anchors.centerIn: parent
                             text: gestureSymbol.length > 0 ? gestureSymbol :
@@ -616,6 +617,7 @@ Item {
                     Item {
                         width: 16
                         height: 16
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                         NText {
                             anchors.centerIn: parent
                             text: gestureSymbol.length > 0 ? gestureSymbol :
