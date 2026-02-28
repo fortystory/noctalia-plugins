@@ -103,8 +103,8 @@ Item {
     // Motion state
     property bool motionActive: false
 
-    readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS * 2
-    readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS * 2
+    readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS
+    readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS
 
     readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
     readonly property real contentHeight: Math.max(28, isVertical ? visualContentHeight : Style.capsuleHeight)

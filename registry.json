@@ -15,7 +15,7 @@
     {
       "id": "query-tracker",
       "name": "query-tracker",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "author": "forty",
       "description": "Track and monitor shell command execution results",
       "repository": "https://github.com/fortystory/noctalia-plugins",
@@ -26,7 +26,7 @@
     {
       "id": "modifier-keys",
       "name": "Modifier Keys",
-      "version": "1.2.13",
+      "version": "1.2.14",
       "author": "forty",
       "description": "Display keyboard modifier keys status and trackpad gestures in the status bar",
       "repository": "https://github.com/fortystory/noctalia-plugins",
