@@ -579,7 +579,7 @@ Item {
                         anchors.centerIn: parent
                         text: gestureSymbol.length > 0 ? gestureSymbol :
                               (motionActive ? (gestureSymbols.motion || "󰆽") :
-                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "‗"))
+                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄"))
                         pointSize: Style.barFontSize - 1
                         color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                         font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
