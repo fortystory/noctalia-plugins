@@ -103,8 +103,8 @@ Item {
     // Motion state
     property bool motionActive: false
 
-    readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginM
-    readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginM
+    readonly property real visualContentWidth: layoutLoader.item ? (root.isVertical ? layoutLoader.item.children[0]?.implicitWidth || 24 : layoutLoader.item.implicitWidth) + Style.marginM : 24
+    readonly property real visualContentHeight: layoutLoader.item ? (root.isVertical ? layoutLoader.item.implicitHeight : layoutLoader.item.children[0]?.implicitHeight || 24) + Style.marginM : 24
 
     readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
     readonly property real contentHeight: Math.max(24, isVertical ? visualContentHeight : Style.capsuleHeight)
@@ -547,47 +547,86 @@ Item {
         border.color: Style.capsuleBorderColor
         border.width: Style.capsuleBorderWidth
 
-        RowLayout {
-            id: rowLayout
+        Loader {
+            id: layoutLoader
             anchors.centerIn: parent
-            spacing: Style.marginS
-            orientation: root.isVertical ? Qt.Vertical : Qt.Horizontal
+            active: true
+            sourceComponent: root.isVertical ? columnLayoutComponent : rowLayoutComponent
 
-            // Render modifier keys dynamically
-            Repeater {
-                model: root.modifierData
-                delegate: NText {
-                    text: modelData.icon
-                    pointSize: Style.barFontSize
-                    color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
-                    font.bold: root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])
-                    opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+            Component {
+                id: rowLayoutComponent
+                RowLayout {
+                    spacing: Style.marginS
 
-                    Behavior on color { ColorAnimation { duration: 100 } }
-                    Behavior on opacity { NumberAnimation { duration: 100 } }
+                    // Render modifier keys dynamically
+                    Repeater {
+                        model: root.modifierData
+                        delegate: NText {
+                            text: modelData.icon
+                            pointSize: Style.barFontSize
+                            color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
+                            font.bold: root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])
+                            opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            Behavior on opacity { NumberAnimation { duration: 100 } }
+                        }
+                    }
+
+                    // Normal keys / Gesture display
+                    Item {
+                        width: 16
+                        height: 16
+                        NText {
+                            anchors.centerIn: parent
+                            text: gestureSymbol.length > 0 ? gestureSymbol :
+                                  (motionActive ? (gestureSymbols.motion || "󰆽") :
+                                  (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
+                            pointSize: Style.barFontSize - 1
+                            color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
+                            font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
+                            opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
+                                      ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
+                        }
+                    }
                 }
             }
 
-            // Normal keys / Gesture display
-            RowLayout {
-                id: normalKeysRow
-                spacing: 0
-                Layout.preferredWidth: 16
-                Layout.preferredHeight: root.isVertical ? 16 : undefined
+            Component {
+                id: columnLayoutComponent
+                ColumnLayout {
+                    spacing: Style.marginS
 
-                Item {
-                    width: root.isVertical ? 16 : 16
-                    height: root.isVertical ? 16 : undefined
-                    NText {
-                        anchors.centerIn: parent
-                        text: gestureSymbol.length > 0 ? gestureSymbol :
-                              (motionActive ? (gestureSymbols.motion || "󰆽") :
-                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
-                        pointSize: Style.barFontSize - 1
-                        color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
-                        font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
-                        opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
-                                  ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
+                    // Render modifier keys dynamically
+                    Repeater {
+                        model: root.modifierData
+                        delegate: NText {
+                            text: modelData.icon
+                            pointSize: Style.barFontSize
+                            color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
+                            font.bold: root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])
+                            opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            Behavior on opacity { NumberAnimation { duration: 100 } }
+                        }
+                    }
+
+                    // Normal keys / Gesture display
+                    Item {
+                        width: 16
+                        height: 16
+                        NText {
+                            anchors.centerIn: parent
+                            text: gestureSymbol.length > 0 ? gestureSymbol :
+                                  (motionActive ? (gestureSymbols.motion || "󰆽") :
+                                  (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
+                            pointSize: Style.barFontSize - 1
+                            color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
+                            font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
+                            opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
+                                      ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
+                        }
                     }
                 }
             }
