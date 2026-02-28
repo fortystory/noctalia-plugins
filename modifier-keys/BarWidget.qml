@@ -103,11 +103,11 @@ Item {
     // Motion state
     property bool motionActive: false
 
-    readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginS
-    readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginS
+    readonly property real visualContentWidth: rowLayout.implicitWidth + Style.marginM
+    readonly property real visualContentHeight: rowLayout.implicitHeight + Style.marginM
 
     readonly property real contentWidth: Math.max(80, isVertical ? Style.capsuleHeight : visualContentWidth)
-    readonly property real contentHeight: Math.max(28, isVertical ? visualContentHeight : Style.capsuleHeight)
+    readonly property real contentHeight: Math.max(24, isVertical ? visualContentHeight : Style.capsuleHeight)
 
     implicitWidth: contentWidth
     implicitHeight: contentHeight
@@ -579,7 +579,7 @@ Item {
                         anchors.centerIn: parent
                         text: gestureSymbol.length > 0 ? gestureSymbol :
                               (motionActive ? (gestureSymbols.motion || "󰆽") :
-                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : ""))
+                              (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "‗"))
                         pointSize: Style.barFontSize - 1
                         color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                         font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
