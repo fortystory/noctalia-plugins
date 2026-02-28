@@ -1,7 +1,7 @@
 {
   "id": "d-tool",
   "name": "D-Tool",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Forty",
   "description": "Collection of developer utilities including timestamp converter and JSON formatter",
   "entryPoints": {

@@ -4,7 +4,7 @@
     {
       "id": "d-tool",
       "name": "d-tool",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": "forty",
       "description": "Collection of developer utilities including timestamp converter and JSON formatter",
       "repository": "https://github.com/fortystory/noctalia-plugins",

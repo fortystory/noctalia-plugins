@@ -22,7 +22,7 @@ Item {
     readonly property real barFontSize: Style.getBarFontSizeForScreen(screenName)
 
     // 内容尺寸 - 根据文档计算
-    readonly property real contentWidth: row.implicitWidth + Style.marginM * 2
+    readonly property real contentWidth: row.implicitWidth + Style.marginM
     readonly property real contentHeight: capsuleHeight
 
     implicitWidth: contentWidth
