@@ -1,7 +1,7 @@
 {
   "id": "query-tracker",
   "name": "Query Tracker",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Track and monitor shell command execution results",
   "repository": "https://github.com/fortystory/noctalia-plugins",
   "author": "forty",
