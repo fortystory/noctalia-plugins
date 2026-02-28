@@ -551,6 +551,7 @@ Item {
             id: rowLayout
             anchors.centerIn: parent
             spacing: Style.marginS
+            orientation: root.isVertical ? Qt.Vertical : Qt.Horizontal
 
             // Render modifier keys dynamically
             Repeater {
@@ -572,9 +573,11 @@ Item {
                 id: normalKeysRow
                 spacing: 0
                 Layout.preferredWidth: 16
+                Layout.preferredHeight: root.isVertical ? 16 : undefined
 
                 Item {
-                    width: 16
+                    width: root.isVertical ? 16 : 16
+                    height: root.isVertical ? 16 : undefined
                     NText {
                         anchors.centerIn: parent
                         text: gestureSymbol.length > 0 ? gestureSymbol :
