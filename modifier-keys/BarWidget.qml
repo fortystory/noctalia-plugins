@@ -19,7 +19,7 @@ Item {
 
     // Default gesture symbols
     readonly property var defaultGestureSymbols: ({
-        "scroll": ["⮆", "⮇", "⮄", "⮅"],
+        "scroll": ["⥤", "⥥", "⥢", "⥣"],
         "swipe3": ["🡆", "🡇", "🡄", "🡅"],
         "swipe4": ["⭲", "⭳", "⭰", "⭱"],
         "click": "󰳽",
@@ -130,7 +130,7 @@ Item {
             "SPACE": "󱁐", "TAB": "", "ENTER": "󰌑", "ESCAPE": "⎋","ESC":"⎋",
             "BACKSPACE": "󰁮", "CAPSLOCK": "⇪", "PRINT": "\uf57d",
             "NUMLOCK": "\uf7c3", "SCROLLLOCK": "\uf86c",
-            "LEFTSHIFT": "\uf17d", "RIGHTSHIFT": "\uf17e",
+            "LEFTSHIFT": "🡅", "RIGHTSHIFT": "🡅",
             "LEFTCTRL": "\uf201", "RIGHTCTRL": "\uf202",
             "LEFTALT": "\uf19a", "RIGHTALT": "\uf19b",
             "LEFTMETA": "\uf17b", "RIGHTMETA": "\uf17c",
@@ -405,7 +405,7 @@ Item {
                 direction = gestureDeltaY > 0 ? 1 : 3;
             }
 
-            const symbols = gestureSymbols.scroll || ["⮆", "⮇", "⮄", "⮅"];
+            const symbols = gestureSymbols.scroll || ["⥤", "⥥", "⥢", "⥣"];
             gestureSymbol = symbols[direction];
             gestureActive = true;
             gestureFading = false;

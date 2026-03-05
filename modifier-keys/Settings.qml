@@ -27,7 +27,7 @@ ColumnLayout {
     }
 
     readonly property var defaultGestureSymbols: {
-        "scroll": ["⮆", "⮇", "⮄", "⮅"],
+        "scroll": ["⥤", "⥥", "⥢", "⥣"],
         "swipe3": ["🡆", "🡇", "🡄", "🡅"],
         "swipe4": ["⭲", "⭳", "⭰", "⭱"],
         "click": "󰳽",

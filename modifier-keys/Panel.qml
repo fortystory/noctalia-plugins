@@ -99,7 +99,7 @@ Item {
                     NText { text: pluginApi?.tr("click", "Click") || "Click"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
-                    NText { text: "⮆ ⮇ ⮄ ⮅"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 90 }
+                    NText { text: "⥤ ⥥ ⥢ ⥣"; pointSize: Style.fontSizeS; color: Color.mPrimary; Layout.preferredWidth: 90 }
                     NText { text: pluginApi?.tr("scroll", "Scroll") || "Scroll"; pointSize: Style.fontSizeS; color: Color.mOnSurfaceVariant }
                 }
                 RowLayout {
