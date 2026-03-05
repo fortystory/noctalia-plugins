@@ -563,9 +563,9 @@ Item {
                         model: root.modifierData
                         delegate: NText {
                             text: modelData.icon
-                            pointSize: Style.barFontSize
+                            pointSize: Style.barFontSize * 1.2
+                            font.weight: Font.Bold
                             color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            font.bold: root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])
                             opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
 
                             Behavior on color { ColorAnimation { duration: 100 } }
@@ -583,9 +583,9 @@ Item {
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
                                   (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
-                            pointSize: Style.barFontSize - 1
+                            pointSize: (Style.barFontSize - 1) * 1.2
+                            font.weight: Font.Bold
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
                                       ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
                         }
@@ -603,9 +603,9 @@ Item {
                         model: root.modifierData
                         delegate: NText {
                             text: modelData.icon
-                            pointSize: Style.barFontSize
+                            pointSize: Style.barFontSize * 1.2
+                            font.weight: Font.Bold
                             color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            font.bold: root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])
                             opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
 
                             Behavior on color { ColorAnimation { duration: 100 } }
@@ -623,9 +623,9 @@ Item {
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
                                   (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
-                            pointSize: Style.barFontSize - 1
+                            pointSize: (Style.barFontSize - 1) * 1.2
+                            font.weight: Font.Bold
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            font.bold: gestureSymbol.length > 0 || motionActive || displayKeys.length > 0
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
                                       ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
                         }
