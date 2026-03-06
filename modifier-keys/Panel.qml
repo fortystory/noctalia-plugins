@@ -35,7 +35,7 @@ Item {
 
     property var modifierSymbols: loadModifierSymbols()
 
-    readonly property panelGeometry: panelContainer
+    readonly property var panelGeometry: panelContainer
     property real contentPreferredWidth: 280 * Style.uiScaleRatio
     property real contentPreferredHeight: 350 * Style.uiScaleRatio
     readonly property bool allowAttach: true
