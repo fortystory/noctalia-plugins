@@ -12,12 +12,23 @@
   "swipe4": "四指滑动",
   "pinch": "缩放",
   "settings": {
-    "label": "手势符号",
-    "desc": "自定义手势显示符号（JSON 格式）",
-    "json": "JSON",
-    "reset": "重置",
-    "copy": "复制",
-    "useDefault": "使用默认",
-    "keys": "可用键名"
+    "modifier": {
+      "label": "修饰键符号",
+      "desc": "自定义修饰键显示符号（JSON 格式）",
+      "json": "JSON",
+      "reset": "重置",
+      "copy": "复制",
+      "useDefault": "使用默认"
+    },
+    "gesture": {
+      "label": "手势符号",
+      "desc": "自定义手势显示符号（JSON 格式）",
+      "json": "JSON",
+      "reset": "重置",
+      "copy": "复制",
+      "useDefault": "使用默认"
+    },
+    "modifierKeys": "修饰键",
+    "gestureKeys": "手势键"
   }
 }

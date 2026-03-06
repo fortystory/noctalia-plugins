@@ -12,12 +12,23 @@
   "swipe4": "4-Finger Swipe",
   "pinch": "Pinch",
   "settings": {
-    "label": "Gesture Symbols",
-    "desc": "Customize gesture display symbols (JSON format)",
-    "json": "JSON",
-    "reset": "Reset",
-    "copy": "Copy",
-    "useDefault": "Use Defaults",
-    "keys": "Available Keys"
+    "modifier": {
+      "label": "Modifier Key Symbols",
+      "desc": "Customize modifier key display symbols (JSON format)",
+      "json": "JSON",
+      "reset": "Reset",
+      "copy": "Copy",
+      "useDefault": "Use Defaults"
+    },
+    "gesture": {
+      "label": "Gesture Symbols",
+      "desc": "Customize gesture display symbols (JSON format)",
+      "json": "JSON",
+      "reset": "Reset",
+      "copy": "Copy",
+      "useDefault": "Use Defaults"
+    },
+    "modifierKeys": "Modifier Keys",
+    "gestureKeys": "Gesture Keys"
   }
 }

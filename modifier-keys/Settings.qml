@@ -129,7 +129,7 @@ ColumnLayout {
     }
 
     NLabel {
-        label: qsTr("Modifier Keys")
+        label: pluginApi?.tr("settings.modifierKeys", "Modifier Keys") || "Modifier Keys"
         description: "super, alt, ctrl, shift"
     }
 
@@ -182,7 +182,7 @@ ColumnLayout {
     }
 
     NLabel {
-        label: qsTr("Gesture Keys")
+        label: pluginApi?.tr("settings.gestureKeys", "Gesture Keys") || "Gesture Keys"
         description: "scroll, swipe3, swipe4, click, rightClick, middleClick, motion, pinchIn, pinchOut"
     }
 
