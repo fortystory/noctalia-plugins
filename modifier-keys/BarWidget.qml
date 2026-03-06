@@ -591,24 +591,33 @@ Item {
                     // Render modifier keys dynamically
                     Repeater {
                         model: root.modifierData
-                        delegate: NText {
-                            text: modelData.icon
-                            pointSize: Style.barFontSize * 1.5
-                            font.weight: Font.Black
-                            color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+                        delegate: Item {
+                            width: 24
+                            height: 24
+                            NText {
+                                id: modifierText
+                                anchors.centerIn: parent
+                                text: modelData.icon
+                                pointSize: Style.barFontSize * 1.5
+                                font.weight: Font.Black
+                                color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
+                                opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+                                scale: root[modelData.pressedProperty] ? 1.3 : 1.0
 
-                            Behavior on color { ColorAnimation { duration: 100 } }
-                            Behavior on opacity { NumberAnimation { duration: 100 } }
+                                Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                                Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
+                            }
                         }
                     }
 
                     // Normal keys / Gesture display
                     Item {
-                        width: 16
-                        height: 16
+                        width: 24
+                        height: 24
                         Layout.alignment: Qt.AlignHCenter
                         NText {
+                            id: keyDisplayText
                             anchors.centerIn: parent
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
@@ -618,6 +627,11 @@ Item {
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
                                       ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
+                            scale: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? 1.2 : 1.0
+
+                            Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                            Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                            Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
                         }
                     }
                 }
@@ -631,15 +645,23 @@ Item {
                     // Render modifier keys dynamically
                     Repeater {
                         model: root.modifierData
-                        delegate: NText {
-                            text: modelData.icon
-                            pointSize: Style.barFontSize * 1.5
-                            font.weight: Font.Black
-                            color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
-                            opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+                        delegate: Item {
+                            width: 24
+                            height: 24
+                            NText {
+                                id: modifierText
+                                anchors.centerIn: parent
+                                text: modelData.icon
+                                pointSize: Style.barFontSize * 1.5
+                                font.weight: Font.Black
+                                color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
+                                opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
+                                scale: root[modelData.pressedProperty] ? 1.3 : 1.0
 
-                            Behavior on color { ColorAnimation { duration: 100 } }
-                            Behavior on opacity { NumberAnimation { duration: 100 } }
+                                Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                                Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
+                                Behavior on scale { NumberAnimation { duration: 120; easing.type: Easing.OutBack } }
+                            }
                         }
                     }
 
