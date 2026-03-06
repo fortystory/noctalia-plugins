@@ -30,6 +30,14 @@ Item {
         "pinchOut": "󰘕"
     })
 
+    // Default modifier symbols
+    readonly property var defaultModifierSymbols: ({
+        "super": "⌘",
+        "alt": "⌥",
+        "ctrl": "⌃",
+        "shift": "🡅"
+    })
+
     // Load gesture symbols from settings
     function loadGestureSymbols() {
         if (!pluginApi) return defaultGestureSymbols;
@@ -48,20 +56,42 @@ Item {
         }
     }
 
+    // Load modifier symbols from settings
+    function loadModifierSymbols() {
+        if (!pluginApi) return defaultModifierSymbols;
+        const cfg = pluginApi.pluginSettings || {};
+        const saved = cfg.modifierSymbols || "";
+        if (!saved || saved.trim() === "") return defaultModifierSymbols;
+        try {
+            const parsed = JSON.parse(saved);
+            // Merge: default + parsed (parsed overrides default)
+            var result = {};
+            for (var k in defaultModifierSymbols) result[k] = defaultModifierSymbols[k];
+            for (var k in parsed) result[k] = parsed[k];
+            return result;
+        } catch (e) {
+            return defaultModifierSymbols;
+        }
+    }
+
     // Current gesture symbols (reactive)
     property var gestureSymbols: loadGestureSymbols()
+
+    // Current modifier symbols (reactive)
+    property var modifierSymbols: loadModifierSymbols()
 
     // Reload symbols when settings change
     function reloadSymbols() {
         gestureSymbols = loadGestureSymbols();
+        modifierSymbols = loadModifierSymbols();
     }
 
     // Modifier key data - data-driven approach
     readonly property var modifierData: [
-        { key: "Meta", pressedProperty: "superPressed", fadingProperty: "superFading", comboProperty: "superInCombo", icon: "\u2318", names: ["LEFTMETA", "RIGHTMETA"] },
-        { key: "Alt", pressedProperty: "altPressed", fadingProperty: "altFading", comboProperty: "altInCombo", icon: "\u2325", names: ["LEFTALT", "RIGHTALT"] },
-        { key: "Ctrl", pressedProperty: "ctrlPressed", fadingProperty: "ctrlFading", comboProperty: "ctrlInCombo", icon: "\u2303", names: ["LEFTCTRL", "RIGHTCTRL"] },
-        { key: "Shift", pressedProperty: "shiftPressed", fadingProperty: "shiftFading", comboProperty: "shiftInCombo", icon: "\u21e7", names: ["LEFTSHIFT", "RIGHTSHIFT"] }
+        { key: "Meta", pressedProperty: "superPressed", fadingProperty: "superFading", comboProperty: "superInCombo", icon: modifierSymbols.super, names: ["LEFTMETA", "RIGHTMETA"] },
+        { key: "Alt", pressedProperty: "altPressed", fadingProperty: "altFading", comboProperty: "altInCombo", icon: modifierSymbols.alt, names: ["LEFTALT", "RIGHTALT"] },
+        { key: "Ctrl", pressedProperty: "ctrlPressed", fadingProperty: "ctrlFading", comboProperty: "ctrlInCombo", icon: modifierSymbols.ctrl, names: ["LEFTCTRL", "RIGHTCTRL"] },
+        { key: "Shift", pressedProperty: "shiftPressed", fadingProperty: "shiftFading", comboProperty: "shiftInCombo", icon: modifierSymbols.shift, names: ["LEFTSHIFT", "RIGHTSHIFT"] }
     ]
 
     // Modifier key states (reactive properties)

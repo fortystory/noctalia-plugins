@@ -26,6 +26,21 @@ ColumnLayout {
         pluginApi.pluginSettings.gestureSymbols = value;
     }
 
+    function getEditModifierSymbols() {
+        if (!pluginApi) return "";
+        var settings = pluginApi.pluginSettings;
+        if (settings && settings.modifierSymbols) return settings.modifierSymbols;
+        var defaults = pluginApi.manifest?.metadata?.defaultSettings;
+        if (defaults && defaults.modifierSymbols) return defaults.modifierSymbols;
+        return "";
+    }
+
+    function setEditModifierSymbols(value) {
+        if (!pluginApi) return;
+        if (!pluginApi.pluginSettings) pluginApi.pluginSettings = {};
+        pluginApi.pluginSettings.modifierSymbols = value;
+    }
+
     readonly property var defaultGestureSymbols: {
         "scroll": ["⥤", "⥥", "⥢", "⥣"],
         "swipe3": ["🡆", "🡇", "🡄", "🡅"],
@@ -38,54 +53,73 @@ ColumnLayout {
         "pinchOut": "󰘕"
     }
 
-    function getDefaultJson() {
+    readonly property var defaultModifierSymbols: {
+        "super": "⌘",
+        "alt": "⌥",
+        "ctrl": "⌃",
+        "shift": "🡅"
+    }
+
+    function getDefaultGestureJson() {
         return JSON.stringify(defaultGestureSymbols, null, 2);
     }
 
-    function getCurrentJson() {
+    function getDefaultModifierJson() {
+        return JSON.stringify(defaultModifierSymbols, null, 2);
+    }
+
+    function getCurrentGestureJson() {
         var saved = getEditSymbols();
         if (saved && saved.toString().trim() !== "") {
             return saved;
         }
-        return getDefaultJson();
+        return getDefaultGestureJson();
+    }
+
+    function getCurrentModifierJson() {
+        var saved = getEditModifierSymbols();
+        if (saved && saved.toString().trim() !== "") {
+            return saved;
+        }
+        return getDefaultModifierJson();
     }
 
     NLabel {
-        label: pluginApi?.tr("settings.label", "Gesture Symbols") || "Gesture Symbols"
-        description: pluginApi?.tr("settings.desc", "Customize gesture display symbols (JSON format)") || "Customize gesture display symbols (JSON format)"
+        label: pluginApi?.tr("settings.modifier.label", "Modifier Key Symbols") || "Modifier Key Symbols"
+        description: pluginApi?.tr("settings.modifier.desc", "Customize modifier key display symbols (JSON format)") || "Customize modifier key display symbols (JSON format)"
     }
 
     NTextInput {
-        id: jsonInput
+        id: modifierJsonInput
         Layout.fillWidth: true
-        label: pluginApi?.tr("settings.json", "JSON") || "JSON"
-        placeholderText: getDefaultJson()
-        text: getCurrentJson()
-        onTextChanged: setEditSymbols(text)
+        label: pluginApi?.tr("settings.modifier.json", "JSON") || "JSON"
+        placeholderText: getDefaultModifierJson()
+        text: getCurrentModifierJson()
+        onTextChanged: setEditModifierSymbols(text)
     }
 
     RowLayout {
         NButton {
-            text: pluginApi?.tr("settings.copy", "Copy") || "Copy"
+            text: pluginApi?.tr("settings.modifier.copy", "Copy") || "Copy"
             onClicked: {
-                var textToCopy = jsonInput.text || getDefaultJson();
+                var textToCopy = modifierJsonInput.text || getDefaultModifierJson();
                 Quickshell.clipboardText = textToCopy;
             }
         }
 
         NButton {
-            text: pluginApi?.tr("settings.reset", "Reset") || "Reset"
+            text: pluginApi?.tr("settings.modifier.reset", "Reset") || "Reset"
             onClicked: {
-                setEditSymbols(getDefaultJson());
-                jsonInput.text = getDefaultJson();
+                setEditModifierSymbols(getDefaultModifierJson());
+                modifierJsonInput.text = getDefaultModifierJson();
             }
         }
 
         NButton {
-            text: pluginApi?.tr("settings.useDefault", "Use Defaults") || "Use Defaults"
+            text: pluginApi?.tr("settings.modifier.useDefault", "Use Defaults") || "Use Defaults"
             onClicked: {
-                setEditSymbols("");
-                jsonInput.text = getDefaultJson();
+                setEditModifierSymbols("");
+                modifierJsonInput.text = getDefaultModifierJson();
             }
         }
     }
@@ -95,7 +129,60 @@ ColumnLayout {
     }
 
     NLabel {
-        label: qsTr("Available Keys")
+        label: qsTr("Modifier Keys")
+        description: "super, alt, ctrl, shift"
+    }
+
+    NDivider {
+        Layout.fillWidth: true
+    }
+
+    NLabel {
+        label: pluginApi?.tr("settings.gesture.label", "Gesture Symbols") || "Gesture Symbols"
+        description: pluginApi?.tr("settings.gesture.desc", "Customize gesture display symbols (JSON format)") || "Customize gesture display symbols (JSON format)"
+    }
+
+    NTextInput {
+        id: jsonInput
+        Layout.fillWidth: true
+        label: pluginApi?.tr("settings.gesture.json", "JSON") || "JSON"
+        placeholderText: getDefaultGestureJson()
+        text: getCurrentGestureJson()
+        onTextChanged: setEditSymbols(text)
+    }
+
+    RowLayout {
+        NButton {
+            text: pluginApi?.tr("settings.gesture.copy", "Copy") || "Copy"
+            onClicked: {
+                var textToCopy = jsonInput.text || getDefaultGestureJson();
+                Quickshell.clipboardText = textToCopy;
+            }
+        }
+
+        NButton {
+            text: pluginApi?.tr("settings.gesture.reset", "Reset") || "Reset"
+            onClicked: {
+                setEditSymbols(getDefaultGestureJson());
+                jsonInput.text = getDefaultGestureJson();
+            }
+        }
+
+        NButton {
+            text: pluginApi?.tr("settings.gesture.useDefault", "Use Defaults") || "Use Defaults"
+            onClicked: {
+                setEditSymbols("");
+                jsonInput.text = getDefaultGestureJson();
+            }
+        }
+    }
+
+    NDivider {
+        Layout.fillWidth: true
+    }
+
+    NLabel {
+        label: qsTr("Gesture Keys")
         description: "scroll, swipe3, swipe4, click, rightClick, middleClick, motion, pinchIn, pinchOut"
     }
 
@@ -106,17 +193,28 @@ ColumnLayout {
             return;
         }
 
-        var jsonStr = jsonInput.text || getDefaultJson();
+        var gestureJsonStr = jsonInput.text || getDefaultGestureJson();
+        var modifierJsonStr = modifierJsonInput.text || getDefaultModifierJson();
+
         // Validate JSON if not empty
-        if (jsonStr && jsonStr.toString().trim() !== "") {
+        if (gestureJsonStr && gestureJsonStr.toString().trim() !== "") {
             try {
-                JSON.parse(jsonStr);
+                JSON.parse(gestureJsonStr);
             } catch (e) {
-                Logger.e("Modifier Keys", "Invalid JSON:", e);
+                Logger.e("Modifier Keys", "Invalid gesture JSON:", e);
             }
         }
 
-        setEditSymbols(jsonStr);
+        if (modifierJsonStr && modifierJsonStr.toString().trim() !== "") {
+            try {
+                JSON.parse(modifierJsonStr);
+            } catch (e) {
+                Logger.e("Modifier Keys", "Invalid modifier JSON:", e);
+            }
+        }
+
+        setEditSymbols(gestureJsonStr);
+        setEditModifierSymbols(modifierJsonStr);
         pluginApi.saveSettings();
         Logger.i("Modifier Keys", "Settings saved");
     }

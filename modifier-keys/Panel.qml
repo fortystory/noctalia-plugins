@@ -9,7 +9,33 @@ Item {
 
     property var pluginApi: null
 
-    readonly property var geometryPlaceholder: panelContainer
+    // Load modifier symbols from settings
+    function loadModifierSymbols() {
+        if (!pluginApi) return defaultModifierSymbols;
+        const cfg = pluginApi.pluginSettings || {};
+        const saved = cfg.modifierSymbols || "";
+        if (!saved || saved.trim() === "") return defaultModifierSymbols;
+        try {
+            const parsed = JSON.parse(saved);
+            var result = {};
+            for (var k in defaultModifierSymbols) result[k] = defaultModifierSymbols[k];
+            for (var k in parsed) result[k] = parsed[k];
+            return result;
+        } catch (e) {
+            return defaultModifierSymbols;
+        }
+    }
+
+    readonly property var defaultModifierSymbols: ({
+        "super": "⌘",
+        "alt": "⌥",
+        "ctrl": "⌃",
+        "shift": "🡅"
+    })
+
+    property var modifierSymbols: loadModifierSymbols()
+
+    readonly property panelGeometry: panelContainer
     property real contentPreferredWidth: 280 * Style.uiScaleRatio
     property real contentPreferredHeight: 350 * Style.uiScaleRatio
     readonly property bool allowAttach: true
@@ -42,10 +68,10 @@ Item {
             // Key list
             Repeater {
                 model: [
-                    { icon: "\u2318", name: pluginApi?.tr("super", "Super (Win)") || "Super (Win)", key: "Meta" },
-                    { icon: "\u2325", name: pluginApi?.tr("alt", "Alt") || "Alt", key: "Alt" },
-                    { icon: "\u2303", name: pluginApi?.tr("ctrl", "Ctrl") || "Ctrl", key: "Ctrl" },
-                    { icon: "\u21e7", name: pluginApi?.tr("shift", "Shift") || "Shift", key: "Shift" }
+                    { key: "Meta", name: pluginApi?.tr("super", "Super (Win)") || "Super (Win)" },
+                    { key: "Alt", name: pluginApi?.tr("alt", "Alt") || "Alt" },
+                    { key: "Ctrl", name: pluginApi?.tr("ctrl", "Ctrl") || "Ctrl" },
+                    { key: "Shift", name: pluginApi?.tr("shift", "Shift") || "Shift" }
                 ]
 
                 RowLayout {
@@ -53,7 +79,7 @@ Item {
                     Layout.fillWidth: true
 
                     NText {
-                        text: modelData.icon
+                        text: root.modifierSymbols[modelData.key.toLowerCase()] || "?"
                         pointSize: Style.fontSizeL
                         color: Color.mPrimary
                         Layout.preferredWidth: 30
