@@ -586,7 +586,7 @@ Item {
             Component {
                 id: rowLayoutComponent
                 RowLayout {
-                    spacing: Style.marginS
+                    spacing: 0
 
                     // Render modifier keys dynamically
                     Repeater {
@@ -598,7 +598,7 @@ Item {
                                 id: modifierText
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                pointSize: Style.barFontSize * 1.5
+                                pointSize: Style.barFontSize * 1.3
                                 font.weight: Font.Black
                                 color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
                                 opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
@@ -622,7 +622,7 @@ Item {
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
                                   (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
-                            pointSize: (Style.barFontSize - 1) * 1.5
+                            pointSize: (Style.barFontSize - 1) * 1.3
                             font.weight: Font.Black
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
@@ -640,7 +640,7 @@ Item {
             Component {
                 id: columnLayoutComponent
                 ColumnLayout {
-                    spacing: Style.marginS
+                    spacing: 0
 
                     // Render modifier keys dynamically
                     Repeater {
@@ -652,7 +652,7 @@ Item {
                                 id: modifierText
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                pointSize: Style.barFontSize * 1.5
+                                pointSize: Style.barFontSize * 1.3
                                 font.weight: Font.Black
                                 color: (root[modelData.pressedProperty] || root[modelData.fadingProperty] || (isFading && root[modelData.comboProperty])) ? Color.mPrimary : Color.mOnSurfaceVariant
                                 opacity: root[modelData.pressedProperty] ? 1.0 : (root[modelData.fadingProperty] ? 0.8 : ((isFading && root[modelData.comboProperty]) ? 0.8 : 0.5))
@@ -675,7 +675,7 @@ Item {
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
                                   (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
-                            pointSize: (Style.barFontSize - 1) * 1.5
+                            pointSize: (Style.barFontSize - 1) * 1.3
                             font.weight: Font.Black
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
