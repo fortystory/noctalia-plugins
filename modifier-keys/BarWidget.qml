@@ -674,7 +674,7 @@ Item {
                             anchors.centerIn: parent
                             text: gestureSymbol.length > 0 ? gestureSymbol :
                                   (motionActive ? (gestureSymbols.motion || "󰆽") :
-                                  (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "䷄")) //䷄天水需 等待
+                                  (displayKeys.length > 0 ? root.getKeyDisplayName(displayKeys[0]) : "_")) //䷄天水需 等待
                             pointSize: (Style.barFontSize - 1) * 1.3
                             font.weight: Font.Black
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
