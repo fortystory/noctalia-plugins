@@ -627,7 +627,7 @@ Item {
                             color: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? Color.mPrimary : Color.mOnSurfaceVariant
                             opacity: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ?
                                       ((gestureFading || isFading) ? 0.6 : 1.0) : 0.2
-                            scale: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? 1.2 : 1.0
+                            scale: (gestureSymbol.length > 0 || motionActive || displayKeys.length > 0) ? 1.0 : 1.0
 
                             Behavior on color { ColorAnimation { duration: 120; easing.type: Easing.OutQuad } }
                             Behavior on opacity { NumberAnimation { duration: 120; easing.type: Easing.OutQuad } }
