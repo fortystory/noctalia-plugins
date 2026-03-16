@@ -11,6 +11,9 @@
   "swipe3": "三指滑动",
   "swipe4": "四指滑动",
   "pinch": "缩放",
+  "help": "帮助",
+  "cancel": "取消",
+  "confirm": "确认",
   "settings": {
     "modifier": {
       "label": "修饰键符号",
@@ -30,5 +33,21 @@
     },
     "modifierKeys": "修饰键",
     "gestureKeys": "手势键"
+  },
+  "stats": {
+    "title": "统计",
+    "today": "今天",
+    "yesterday": "昨天",
+    "thisWeek": "本周",
+    "thisMonth": "本月",
+    "allTime": "全部",
+    "totalKeypresses": "总按键次数",
+    "mostUsedKey": "最常用按键",
+    "mostUsedShortcut": "最常用组合",
+    "topKeys": "最常用按键 TOP 20",
+    "topShortcuts": "快捷键组合 TOP 20",
+    "clearStats": "清空统计数据",
+    "clearConfirm": "确定要清空所有统计数据吗？此操作不可恢复。",
+    "noData": "暂无数据"
   }
 }

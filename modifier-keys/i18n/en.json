@@ -11,6 +11,9 @@
   "swipe3": "3-Finger Swipe",
   "swipe4": "4-Finger Swipe",
   "pinch": "Pinch",
+  "help": "Help",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
   "settings": {
     "modifier": {
       "label": "Modifier Key Symbols",
@@ -30,5 +33,21 @@
     },
     "modifierKeys": "Modifier Keys",
     "gestureKeys": "Gesture Keys"
+  },
+  "stats": {
+    "title": "Statistics",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "allTime": "All Time",
+    "totalKeypresses": "Total Keypresses",
+    "mostUsedKey": "Most Used Key",
+    "mostUsedShortcut": "Most Used Shortcut",
+    "topKeys": "Top 20 Keys",
+    "topShortcuts": "Top 20 Shortcuts",
+    "clearStats": "Clear Statistics",
+    "clearConfirm": "Are you sure you want to clear all statistics? This cannot be undone.",
+    "noData": "No Data"
   }
 }
