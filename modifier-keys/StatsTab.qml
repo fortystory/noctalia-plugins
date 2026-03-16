@@ -17,6 +17,65 @@ Item {
     property var topShortcuts: []
     property int totalCount: 0
 
+    // Key symbol mapping
+    readonly property var keySymbols: ({
+        // Modifier keys
+        "SUPER": "󰘳", "META": "󰘳",
+        "CTRL": "⌃", "CONTROL": "⌃",
+        "ALT": "⌥",
+        "SHIFT": "⇧",
+        // Common keys
+        "SPACE": "󱁐", " ": "󱁐",
+        "ENTER": "↵", "RETURN": "↵",
+        "BACKSPACE": "⌫",
+        "TAB": "⇥",
+        "ESCAPE": "⎋", "ESC": "⎋",
+        "DELETE": "⌦",
+        "INSERT": "⎀",
+        // Arrow keys
+        "UP": "󰁀", "DOWN": "󰁃", "LEFT": "󰁂", "RIGHT": "󰁁",
+        // Navigation
+        "HOME": "󰘍", "END": "󰘎",
+        "PAGEUP": "⇞", "PAGEDOWN": "⇟",
+        // Function keys
+        "F1": "F1", "F2": "F2", "F3": "F3", "F4": "F4",
+        "F5": "F5", "F6": "F6", "F7": "F7", "F8": "F8",
+        "F9": "F9", "F10": "F10", "F11": "F11", "F12": "F12",
+        // Special
+        "CAPSLOCK": "⇪",
+        "NUMLOCK": "⌤",
+        "SCROLLLOCK": "⤓"
+    })
+
+    // Modifier symbol mapping for shortcuts
+    readonly property var modifierSymbols: ({
+        "SUPER": "󰘳", "META": "󰘳",
+        "CTRL": "⌃", "CONTROL": "⌃",
+        "ALT": "⌥",
+        "SHIFT": "⇧"
+    })
+
+    function getKeySymbol(keyName) {
+        var upper = keyName.toUpperCase()
+        return keySymbols[upper] || upper
+    }
+
+    function formatShortcut(shortcut) {
+        if (!shortcut) return "-"
+        var parts = shortcut.split("+")
+        var result = []
+        for (var i = 0; i < parts.length; i++) {
+            var part = parts[i].toUpperCase()
+            // Use modifier symbols for modifiers, key symbols for the last part
+            if (i < parts.length - 1) {
+                result.push(modifierSymbols[part] || part)
+            } else {
+                result.push(keySymbols[part] || part)
+            }
+        }
+        return result.join(" + ")
+    }
+
     function loadStats() {
         totalCount = KeyStats.getTotalCount(currentDateRange)
         topKeys = KeyStats.getTopKeys(currentDateRange, 20)
@@ -25,12 +84,14 @@ Item {
 
     function getMostUsedKey() {
         if (topKeys.length === 0) return "-"
-        return topKeys[0].stat_key + " (" + topKeys[0].total + ")"
+        var key = topKeys[0].stat_key
+        return getKeySymbol(key) + " (" + topKeys[0].total.toLocaleString() + ")"
     }
 
     function getMostUsedShortcut() {
         if (topShortcuts.length === 0) return "-"
-        return topShortcuts[0].stat_key + " (" + topShortcuts[0].total + ")"
+        var shortcut = topShortcuts[0].stat_key
+        return formatShortcut(shortcut) + " (" + topShortcuts[0].total.toLocaleString() + ")"
     }
 
     function getMaxCount(items) {
@@ -174,7 +235,7 @@ Item {
                                 }
 
                                 NText {
-                                    text: modelData.stat_key
+                                    text: getKeySymbol(modelData.stat_key)
                                     pointSize: Style.fontSizeS
                                     color: Color.mOnSurface
                                     Layout.preferredWidth: 70
@@ -255,7 +316,7 @@ Item {
                                 }
 
                                 NText {
-                                    text: modelData.stat_key
+                                    text: formatShortcut(modelData.stat_key)
                                     pointSize: Style.fontSizeS
                                     color: Color.mOnSurface
                                     Layout.preferredWidth: 90
