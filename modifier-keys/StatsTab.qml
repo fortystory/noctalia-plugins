@@ -121,142 +121,173 @@ Item {
             }
         }
 
-        // Top Keys Section
-        NText {
-            text: pluginApi?.tr("stats.topKeys", "Top 20 Keys") || "Top 20 Keys"
-            pointSize: Style.fontSizeM
-            font.bold: true
-            color: Color.mOnSurface
-        }
-
-        ListView {
-            id: keysList
+        // Two-column layout for keys and shortcuts
+        RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(contentHeight, 200)
-            clip: true
-            model: topKeys
-            spacing: 2
-
-            delegate: Rectangle {
-                width: keysList.width
-                height: 24
-                color: Style.capsuleColor
-                radius: Style.radiusS
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: Style.marginS
-                    anchors.rightMargin: Style.marginS
-                    spacing: Style.marginS
-
-                    NText {
-                        text: (index + 1) + "."
-                        pointSize: Style.fontSizeS
-                        color: Color.mOnSurfaceVariant
-                        Layout.preferredWidth: 20
-                    }
-
-                    NText {
-                        text: modelData.stat_key
-                        pointSize: Style.fontSizeS
-                        color: Color.mOnSurface
-                        Layout.preferredWidth: 80
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 8
-                        radius: 4
-                        color: Color.mSurfaceVariant
-
-                        Rectangle {
-                            width: parent.width * (modelData.total / getMaxCount(topKeys))
-                            height: parent.height
-                            radius: parent.radius
-                            color: Color.mPrimary
-                        }
-                    }
-
-                    NText {
-                        text: modelData.total.toLocaleString()
-                        pointSize: Style.fontSizeS
-                        color: Color.mPrimary
-                        Layout.preferredWidth: 50
-                        horizontalAlignment: Text.AlignRight
-                    }
-                }
-            }
-        }
-
-        // Top Shortcuts Section
-        NText {
-            text: pluginApi?.tr("stats.topShortcuts", "Top 20 Shortcuts") || "Top 20 Shortcuts"
-            pointSize: Style.fontSizeM
-            font.bold: true
-            color: Color.mOnSurface
-        }
-
-        ListView {
-            id: shortcutsList
-            Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(contentHeight, 200)
-            clip: true
-            model: topShortcuts
-            spacing: 2
-
-            delegate: Rectangle {
-                width: shortcutsList.width
-                height: 24
-                color: Style.capsuleColor
-                radius: Style.radiusS
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: Style.marginS
-                    anchors.rightMargin: Style.marginS
-                    spacing: Style.marginS
-
-                    NText {
-                        text: (index + 1) + "."
-                        pointSize: Style.fontSizeS
-                        color: Color.mOnSurfaceVariant
-                        Layout.preferredWidth: 20
-                    }
-
-                    NText {
-                        text: modelData.stat_key
-                        pointSize: Style.fontSizeS
-                        color: Color.mOnSurface
-                        Layout.preferredWidth: 120
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 8
-                        radius: 4
-                        color: Color.mSurfaceVariant
-
-                        Rectangle {
-                            width: parent.width * (modelData.total / getMaxCount(topShortcuts))
-                            height: parent.height
-                            radius: parent.radius
-                            color: Color.mSecondary
-                        }
-                    }
-
-                    NText {
-                        text: modelData.total.toLocaleString()
-                        pointSize: Style.fontSizeS
-                        color: Color.mSecondary
-                        Layout.preferredWidth: 50
-                        horizontalAlignment: Text.AlignRight
-                    }
-                }
-            }
-        }
-
-        Item {
             Layout.fillHeight: true
+            spacing: Style.marginM
+
+            // Left column - Top Keys
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: 4
+
+                NText {
+                    text: pluginApi?.tr("stats.topKeys", "Top 20 Keys") || "Top 20 Keys"
+                    pointSize: Style.fontSizeM
+                    font.bold: true
+                    color: Color.mPrimary
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: Color.mSurfaceVariant
+                    radius: Style.radiusM
+
+                    ListView {
+                        id: keysList
+                        anchors.fill: parent
+                        anchors.margins: Style.marginS
+                        clip: true
+                        model: topKeys
+                        spacing: 4
+
+                        delegate: Rectangle {
+                            width: keysList.width - Style.marginS * 2
+                            height: 28
+                            color: Style.capsuleColor
+                            radius: Style.radiusS
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: Style.marginS
+                                anchors.rightMargin: Style.marginS
+                                spacing: Style.marginS
+
+                                NText {
+                                    text: (index + 1) + "."
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mOnSurfaceVariant
+                                    Layout.preferredWidth: 20
+                                }
+
+                                NText {
+                                    text: modelData.stat_key
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mOnSurface
+                                    Layout.preferredWidth: 70
+                                    elide: Text.ElideRight
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 8
+                                    radius: 4
+                                    color: Color.mSurface
+
+                                    Rectangle {
+                                        width: parent.width * (modelData.total / getMaxCount(topKeys))
+                                        height: parent.height
+                                        radius: parent.radius
+                                        color: Color.mPrimary
+                                    }
+                                }
+
+                                NText {
+                                    text: modelData.total.toLocaleString()
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mPrimary
+                                    Layout.preferredWidth: 45
+                                    horizontalAlignment: Text.AlignRight
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Right column - Top Shortcuts
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: 4
+
+                NText {
+                    text: pluginApi?.tr("stats.topShortcuts", "Top 20 Shortcuts") || "Top 20 Shortcuts"
+                    pointSize: Style.fontSizeM
+                    font.bold: true
+                    color: Color.mSecondary
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    color: Color.mSurfaceVariant
+                    radius: Style.radiusM
+
+                    ListView {
+                        id: shortcutsList
+                        anchors.fill: parent
+                        anchors.margins: Style.marginS
+                        clip: true
+                        model: topShortcuts
+                        spacing: 4
+
+                        delegate: Rectangle {
+                            width: shortcutsList.width - Style.marginS * 2
+                            height: 28
+                            color: Style.capsuleColor
+                            radius: Style.radiusS
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: Style.marginS
+                                anchors.rightMargin: Style.marginS
+                                spacing: Style.marginS
+
+                                NText {
+                                    text: (index + 1) + "."
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mOnSurfaceVariant
+                                    Layout.preferredWidth: 20
+                                }
+
+                                NText {
+                                    text: modelData.stat_key
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mOnSurface
+                                    Layout.preferredWidth: 90
+                                    elide: Text.ElideRight
+                                }
+
+                                Rectangle {
+                                    Layout.fillWidth: true
+                                    height: 8
+                                    radius: 4
+                                    color: Color.mSurface
+
+                                    Rectangle {
+                                        width: parent.width * (modelData.total / getMaxCount(topShortcuts))
+                                        height: parent.height
+                                        radius: parent.radius
+                                        color: Color.mSecondary
+                                    }
+                                }
+
+                                NText {
+                                    text: modelData.total.toLocaleString()
+                                    pointSize: Style.fontSizeS
+                                    color: Color.mSecondary
+                                    Layout.preferredWidth: 45
+                                    horizontalAlignment: Text.AlignRight
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         // Clear button
