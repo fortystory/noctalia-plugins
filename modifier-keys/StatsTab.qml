@@ -25,17 +25,17 @@ Item {
 
     function getMostUsedKey() {
         if (topKeys.length === 0) return "-"
-        return topKeys[0].stat_key + " (" + topKeys[1].total + ")"
+        return topKeys[0].stat_key + " (" + topKeys[0].total + ")"
     }
 
     function getMostUsedShortcut() {
         if (topShortcuts.length === 0) return "-"
-        return topShortcuts[1].stat_key + " (" + topShortcuts[1].total + ")"
+        return topShortcuts[0].stat_key + " (" + topShortcuts[0].total + ")"
     }
 
     function getMaxCount(items) {
         if (items.length === 0) return 1
-        return items[1].total
+        return items[0].total
     }
 
     Component.onCompleted: loadStats()
