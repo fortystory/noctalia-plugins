@@ -118,25 +118,240 @@ modifier-keys/
 ### 3.2 KeyStats.js 模块
 
 ```javascript
-// 数据库连接
-function initDatabase() { ... }
-function openDatabase() { ... }
+// ==================== 常量定义 ====================
 
-// 写入操作
-function recordKeyEvent(keyName, modifiers, shortcut) { ... }
-function flushBuffer() { ... }
+// 数据库名称（使用插件 ID 确保唯一性）
+const DB_NAME = "modifier-keys-stats";
+const DB_VERSION = "1.0";
+const DB_DESCRIPTION = "Modifier Keys Statistics Database";
+const DB_SIZE = 5 * 1024 * 1024;  // 5 MB
 
-// 聚合操作
-function aggregateToday() { ... }
-function cleanupOldData() { ... }
+// 修饰键标准化顺序（按优先级排序）
+const MODIFIER_ORDER = ["Super", "Ctrl", "Alt", "Shift"];
 
-// 查询操作
-function getTotalCount(dateRange) { ... }
-function getTopKeys(dateRange, limit) { ... }
-function getTopShortcuts(dateRange, limit) { ... }
+// ==================== 数据库连接 ====================
 
-// 管理操作
-function clearAllStats() { ... }
+let _db = null;
+
+function openDatabase() {
+    if (_db) return _db;
+    _db = LocalStorage.openDatabaseSync(DB_NAME, DB_VERSION, DB_DESCRIPTION, DB_SIZE);
+    initDatabase(_db);
+    return _db;
+}
+
+function initDatabase(db) {
+    db.transaction(function(tx) {
+        tx.executeSql('CREATE TABLE IF NOT EXISTS key_events (...)');
+        tx.executeSql('CREATE TABLE IF NOT EXISTS key_stats_daily (...)');
+        tx.executeSql('CREATE TABLE IF NOT EXISTS daily_totals (...)');
+    });
+}
+
+// ==================== 快捷键标准化 ====================
+
+function normalizeShortcut(modifiers, keyName) {
+    if (!modifiers || modifiers.length === 0) return null;
+    
+    // 按固定顺序排序修饰键
+    const sorted = modifiers.slice().sort((a, b) => {
+        return MODIFIER_ORDER.indexOf(a) - MODIFIER_ORDER.indexOf(b);
+    });
+    
+    // 组合成快捷键字符串
+    return sorted.join("+") + "+" + keyName;
+}
+
+// ==================== 按键名称标准化 ====================
+
+function normalizeKeyName(rawKeyName) {
+    // 移除 KEY_ 前缀
+    let name = rawKeyName.replace(/^KEY_/, "");
+    
+    // 特殊键映射
+    const keyMap = {
+        "LEFTMETA": "Super", "RIGHTMETA": "Super",
+        "LEFTALT": "Alt", "RIGHTALT": "Alt",
+        "LEFTCTRL": "Ctrl", "RIGHTCTRL": "Ctrl",
+        "LEFTSHIFT": "Shift", "RIGHTSHIFT": "Shift"
+    };
+    
+    return keyMap[name.toUpperCase()] || name.toUpperCase();
+}
+
+// ==================== 时间范围查询 ====================
+
+function getDateRangeCondition(range) {
+    const now = new Date();
+    const today = formatDate(now);
+    
+    switch(range) {
+        case "today":
+            return `date = '${today}'`;
+        case "yesterday":
+            const yesterday = formatDate(new Date(now - 86400000));
+            return `date = '${yesterday}'`;
+        case "week":
+            // 本周 = 周一到今天
+            const weekStart = getWeekStart(now);
+            return `date >= '${formatDate(weekStart)}'`;
+        case "month":
+            // 本月 = 1日到今天
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            return `date >= '${formatDate(monthStart)}'`;
+        case "all":
+            return "1=1";
+        default:
+            return `date = '${today}'`;
+    }
+}
+
+function formatDate(date) {
+    return date.toISOString().split('T')[0];  // YYYY-MM-DD
+}
+
+function getWeekStart(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);  // 周一为一周开始
+    return new Date(d.setDate(diff));
+}
+
+// ==================== 写入操作 ====================
+
+let _buffer = [];
+const BUFFER_SIZE = 50;
+const FLUSH_INTERVAL = 30000;  // 30秒
+
+function recordKeyEvent(keyName, modifiers, shortcut) {
+    const normalizedKey = normalizeKeyName(keyName);
+    const normalizedShortcut = normalizeShortcut(modifiers, normalizedKey);
+    
+    _buffer.push({
+        keyName: normalizedKey,
+        modifiers: modifiers ? modifiers.join("+") : null,
+        shortcut: normalizedShortcut,
+        timestamp: Date.now()
+    });
+    
+    if (_buffer.length >= BUFFER_SIZE) {
+        flushBuffer();
+    }
+}
+
+function flushBuffer() {
+    if (_buffer.length === 0) return;
+    
+    const db = openDatabase();
+    const today = formatDate(new Date());
+    
+    db.transaction(function(tx) {
+        for (const event of _buffer) {
+            // 写入原始事件
+            tx.executeSql(
+                'INSERT INTO key_events (key_name, modifiers, shortcut, timestamp) VALUES (?, ?, ?, ?)',
+                [event.keyName, event.modifiers, event.shortcut, event.timestamp]
+            );
+            
+            // 更新每日统计
+            tx.executeSql(
+                'INSERT OR REPLACE INTO key_stats_daily (date, stat_type, stat_key, count) VALUES (?, ?, ?, COALESCE((SELECT count FROM key_stats_daily WHERE date=? AND stat_type=? AND stat_key=?), 0) + 1)',
+                [today, 'key', event.keyName, today, 'key', event.keyName]
+            );
+            
+            if (event.shortcut) {
+                tx.executeSql(
+                    'INSERT OR REPLACE INTO key_stats_daily (date, stat_type, stat_key, count) VALUES (?, ?, ?, COALESCE((SELECT count FROM key_stats_daily WHERE date=? AND stat_type=? AND stat_key=?), 0) + 1)',
+                    [today, 'shortcut', event.shortcut, today, 'shortcut', event.shortcut]
+                );
+            }
+            
+            // 更新每日总数
+            tx.executeSql(
+                'INSERT OR REPLACE INTO daily_totals (date, total_keypresses) VALUES (?, COALESCE((SELECT total_keypresses FROM daily_totals WHERE date=?), 0) + 1)',
+                [today, today]
+            );
+        }
+    });
+    
+    _buffer = [];
+}
+
+// ==================== 生命周期管理 ====================
+
+// 在 BarWidget.qml 中调用
+function onPluginDestroy() {
+    flushBuffer();  // 插件卸载前刷新缓冲区
+}
+
+// ==================== 查询操作 ====================
+
+function getTotalCount(dateRange) {
+    const db = openDatabase();
+    const condition = getDateRangeCondition(dateRange);
+    let result = 0;
+    
+    db.readTransaction(function(tx) {
+        const rs = tx.executeSql(`SELECT SUM(total_keypresses) as total FROM daily_totals WHERE ${condition}`);
+        if (rs.rows.length > 0) {
+            result = rs.rows.item(0).total || 0;
+        }
+    });
+    
+    return result;
+}
+
+function getTopKeys(dateRange, limit) {
+    const db = openDatabase();
+    const condition = getDateRangeCondition(dateRange);
+    const results = [];
+    
+    db.readTransaction(function(tx) {
+        const rs = tx.executeSql(`SELECT stat_key, SUM(count) as total FROM key_stats_daily WHERE stat_type='key' AND ${condition} GROUP BY stat_key ORDER BY total DESC LIMIT ?`, [limit]);
+        for (let i = 0; i < rs.rows.length; i++) {
+            results.push(rs.rows.item(i));
+        }
+    });
+    
+    return results;
+}
+
+function getTopShortcuts(dateRange, limit) {
+    const db = openDatabase();
+    const condition = getDateRangeCondition(dateRange);
+    const results = [];
+    
+    db.readTransaction(function(tx) {
+        const rs = tx.executeSql(`SELECT stat_key, SUM(count) as total FROM key_stats_daily WHERE stat_type='shortcut' AND ${condition} GROUP BY stat_key ORDER BY total DESC LIMIT ?`, [limit]);
+        for (let i = 0; i < rs.rows.length; i++) {
+            results.push(rs.rows.item(i));
+        }
+    });
+    
+    return results;
+}
+
+// ==================== 数据清理 ====================
+
+function cleanupOldData() {
+    const db = openDatabase();
+    const yesterday = formatDate(new Date(Date.now() - 86400000));
+    
+    db.transaction(function(tx) {
+        // 清理超过1天的原始事件
+        tx.executeSql('DELETE FROM key_events WHERE date(timestamp/1000, "unixepoch") < ?', [yesterday]);
+    });
+}
+
+function clearAllStats() {
+    const db = openDatabase();
+    db.transaction(function(tx) {
+        tx.executeSql('DELETE FROM key_events');
+        tx.executeSql('DELETE FROM key_stats_daily');
+        tx.executeSql('DELETE FROM daily_totals');
+    });
+    _buffer = [];
+}
 ```
 
 ### 3.3 BarWidget.qml 修改
@@ -144,29 +359,139 @@ function clearAllStats() { ... }
 在 `parseKeyboardEvent()` 函数中添加统计记录：
 
 ```javascript
+import "KeyStats.js" as KeyStats
+
+// 添加到现有属性
+property var lastDate: ""  // 用于检测日期变化
+
+// 在 Component.onCompleted 中初始化
+Component.onCompleted: {
+    Logger.d("Modifier Keys", "BarWidget loaded");
+    KeyStats.openDatabase();  // 初始化数据库
+    lastDate = Qt.formatDate(new Date(), "yyyy-MM-dd");
+}
+
+// 添加生命周期处理
+Component.onDestruction: {
+    KeyStats.flushBuffer();  // 确保退出前保存数据
+}
+
+// 日期变化检测（每分钟检查一次）
+Timer {
+    id: dateCheckTimer
+    interval: 60000
+    running: true
+    repeat: true
+    onTriggered: {
+        const today = Qt.formatDate(new Date(), "yyyy-MM-dd");
+        if (today !== lastDate) {
+            KeyStats.cleanupOldData();  // 清理旧数据
+            lastDate = today;
+        }
+    }
+}
+
+// 定期刷新缓冲区
+Timer {
+    id: flushTimer
+    interval: 30000  // 30秒
+    running: true
+    repeat: true
+    onTriggered: KeyStats.flushBuffer()
+}
+
 function parseKeyboardEvent(line) {
     // ... 现有逻辑 ...
 
     // 记录统计（仅记录按下事件）
     if (isPressed) {
-        KeyStats.recordKeyEvent(keyName, activeModifiers, shortcut);
+        // 收集当前激活的修饰键
+        const activeModifiers = [];
+        if (superPressed) activeModifiers.push("Super");
+        if (ctrlPressed) activeModifiers.push("Ctrl");
+        if (altPressed) activeModifiers.push("Alt");
+        if (shiftPressed) activeModifiers.push("Shift");
+        
+        KeyStats.recordKeyEvent(keyName, activeModifiers);
     }
 }
 ```
 
 ### 3.4 Panel.qml 重构
 
-改造为 Tab 面板容器：
+改造为 Tab 面板容器。**注意**：Noctalia Shell 使用 Quickshell 框架，没有内置 TabBar/StackLayout 组件，需要自定义实现：
 
 ```qml
-RowLayout {
-    // Tab 导航
-    TabBar { ... }
+import QtQuick
+import QtQuick.Layouts
+import qs.Commons
+import qs.Widgets
+import "HelpTab.qml"
+import "StatsTab.qml"
 
-    // Tab 内容
-    StackLayout {
-        HelpTab { }      // 原帮助内容
-        StatsTab { }     // 新统计内容
+Item {
+    id: root
+    property var pluginApi: null
+    property int currentTab: 0  // 0: 帮助, 1: 统计
+
+    // Tab 导航按钮（自定义实现）
+    RowLayout {
+        id: tabBar
+        spacing: 0
+        
+        Repeater {
+            model: [
+                { text: "⌨️ " + (pluginApi?.tr("help", "帮助") || "帮助"), tab: 0 },
+                { text: "📊 " + (pluginApi?.tr("stats.title", "统计") || "统计"), tab: 1 }
+            ]
+            
+            delegate: Rectangle {
+                width: tabText.implicitWidth + Style.marginM * 2
+                height: 32
+                color: currentTab === modelData.tab ? Color.mPrimary : "transparent"
+                radius: Style.radiusS
+                
+                NText {
+                    id: tabText
+                    anchors.centerIn: parent
+                    text: modelData.text
+                    color: currentTab === modelData.tab ? Color.mOnPrimary : Color.mOnSurfaceVariant
+                    pointSize: Style.fontSizeM
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: currentTab = modelData.tab
+                }
+            }
+        }
+    }
+
+    // Tab 内容（使用 Loader 按需加载）
+    ColumnLayout {
+        anchors.top: tabBar.bottom
+        anchors.topMargin: Style.marginS
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        
+        Loader {
+            id: contentLoader
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            sourceComponent: currentTab === 0 ? helpTabComponent : statsTabComponent
+        }
+    }
+    
+    Component {
+        id: helpTabComponent
+        HelpTab { pluginApi: root.pluginApi }
+    }
+    
+    Component {
+        id: statsTabComponent
+        StatsTab { pluginApi: root.pluginApi }
     }
 }
 ```
@@ -424,3 +749,20 @@ function migrateDatabase(db) {
 - [ ] 导出统计数据为 CSV/JSON
 - [ ] 按键热力图可视化
 - [ ] 设置数据保留策略（保留 N 天/周/月）
+
+---
+
+## 附录 A: 规格审查问题修复记录
+
+### 审查轮次 1 发现的问题及修复
+
+| # | 问题 | 修复方式 |
+|---|------|----------|
+| 1 | 时间范围定义模糊 | 添加 `getDateRangeCondition()` 函数，明确本周=周一到今天，本月=1日到今天 |
+| 2 | 快捷键检测逻辑缺失 | 在 BarWidget.qml 修改部分添加修饰键收集逻辑 |
+| 3 | 快捷键标准化算法未定义 | 添加 `normalizeShortcut()` 函数，修饰键按 Super>Ctrl>Alt>Shift 顺序排序 |
+| 4 | 数据库文件位置未指定 | 添加 `DB_NAME = "modifier-keys-stats"` 常量定义 |
+| 5 | 应用生命周期处理缺失 | 添加 `Component.onDestruction` 调用 `flushBuffer()` |
+| 6 | 按键名称存储规范不清 | 添加 `normalizeKeyName()` 函数，移除 KEY_ 前缀，标准化修饰键名称 |
+| 7 | 每日午夜清理触发器缺失 | 添加 `dateCheckTimer` 每分钟检查日期变化，触发 `cleanupOldData()` |
+| 8 | TabBar 组件未明确 | 重写 Panel.qml 使用自定义 Tab 导航，不依赖 Qt Quick Controls TabBar |
