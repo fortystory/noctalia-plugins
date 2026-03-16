@@ -1,15 +1,19 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.LocalStorage
 import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Services.UI
 import qs.Widgets
+import "KeyStats.js" as KeyStats
 
 Item {
     id: root
 
     property var pluginApi: null
+
+    property string lastDate: ""
 
     property ShellScreen screen
     property string widgetId: ""
@@ -144,6 +148,12 @@ Item {
 
     Component.onCompleted: {
         Logger.d("Modifier Keys", "BarWidget loaded");
+        KeyStats.openDatabase();
+        lastDate = Qt.formatDate(new Date(), "yyyy-MM-dd");
+    }
+
+    Component.onDestruction: {
+        KeyStats.flushBuffer();
     }
 
     // Key display name mapping
@@ -275,6 +285,30 @@ Item {
         }
     }
 
+    // Timer for date change detection
+    Timer {
+        id: dateCheckTimer
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: {
+            var today = Qt.formatDate(new Date(), "yyyy-MM-dd");
+            if (today !== lastDate) {
+                KeyStats.cleanupOldData();
+                lastDate = today;
+            }
+        }
+    }
+
+    // Timer for buffer flush
+    Timer {
+        id: flushTimer
+        interval: 30000
+        running: true
+        repeat: true
+        onTriggered: KeyStats.flushBuffer()
+    }
+
     // Process to monitor keyboard events
     Process {
         id: keyboardMonitor
@@ -374,6 +408,15 @@ Item {
         // Normal key
         if (state) {
             addKey(keyName);
+
+            // 记录统计（仅记录按下事件）
+            const activeModifiers = [];
+            if (superPressed) activeModifiers.push("Super");
+            if (ctrlPressed) activeModifiers.push("Ctrl");
+            if (altPressed) activeModifiers.push("Alt");
+            if (shiftPressed) activeModifiers.push("Shift");
+
+            KeyStats.recordKeyEvent(keyName, activeModifiers);
         } else {
             removeKey(keyName);
         }
