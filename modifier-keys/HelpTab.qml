@@ -12,8 +12,8 @@ Item {
 
     function loadModifierSymbols() {
         if (!pluginApi) return defaultModifierSymbols;
-        const cfg = pluginApi.pluginSettings || {};
-        const saved = cfg.modifierSymbols || "";
+        var cfg = pluginApi.pluginSettings || {};
+        var saved = cfg.modifierSymbols || "";
         if (!saved || saved.trim() === "") return defaultModifierSymbols;
         try {
             const parsed = JSON.parse(saved);
