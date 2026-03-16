@@ -12,8 +12,8 @@ Item {
     property int currentTab: 0  // 0: 帮助, 1: 统计
 
     readonly property var panelGeometry: panelContainer
-    property real contentPreferredWidth: 320 * Style.uiScaleRatio
-    property real contentPreferredHeight: 450 * Style.uiScaleRatio
+    property real contentPreferredWidth: 360 * Style.uiScaleRatio
+    property real contentPreferredHeight: 580 * Style.uiScaleRatio
     readonly property bool allowAttach: true
 
     anchors.fill: parent
