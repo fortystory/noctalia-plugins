@@ -1,6 +1,6 @@
 # noctalia-plugins
 
-Noctalia Shell 插件集合。
+Noctalia Shell 插件集合
 
 ## 插件列表
 
