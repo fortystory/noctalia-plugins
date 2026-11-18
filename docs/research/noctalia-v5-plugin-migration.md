@@ -19,6 +19,8 @@
 
 > 资料冲突说明: 搜索摘要中出现过 `ctx.ui.open({ panel })`, `definePlugin(...)`, `legacyPluginApi` 兼容开关等说法. 本机 v5.5.0 二进制与 v5.5.0 源码中均不存在这些接口或兼容层. 实际接口是 `noctalia.togglePanel(id)`, `noctalia.openSettings()`, `panel.render()` 等 [S1][S7][S8][S21]. 本文以本机实际 v5.5.0 为准.
 
+> **2026-11-19 更新**: 本文第 4.5/4.6 节的 manifest 与骨架是迁移前建议, 实际落地后有若干差异. 按本文实现 modifier-keys 后新增的结论、已验证的坑与通用迁移步骤见第 9 节. 新插件迁移优先参考第 9 节, 并以仓库中的最终实现为准.
+
 ## 1. 事实基线: 本机运行的是 v5, QML 是 v4 遗留
 
 | 项目 | 实际内容 | 证据 |
@@ -892,3 +894,83 @@ modifier-keys/
 ## 8. 一句话建议
 
 保留 v4 的 QML 文件与 `manifest.json` 作为 legacy 版本, 在同一个 `modifier-keys/` 目录新增 `plugin.toml` + `bar.luau` + `input.luau` + `panel.luau` + `stats.luau` + `translations/`, 使用 `noctalia.runStream` 接 `libinput debug-events`, 用 `noctalia.state` 在 service/bar/panel 之间共享状态, widget id 固定为 `bar`, 然后启用 v5 的 `forty` path source. 这样既不影响 v4, 也能让现有 v5 bar 配置直接生效.
+
+## 9. 实现经验补充 (modifier-keys v5 落地后)
+
+更新日期: 2026-11-19. 以下为按本文实现并实际验证后新增的结论; 其他插件迁移时优先参考本节.
+
+### 9.1 `ui.label` 的宽度陷阱
+
+- v5 的通用 node props 只处理 `visible` / `opacity` / `flexGrow` / `translate*` / `scale*` / `rotation` / `clip`; `label` 分支 (`applyLabelProps`) 不处理 `width` / `height`. 写在 `ui.label` 上的 `width` 会被静默忽略.
+- 证据: `src/scripting/ui/ui_tree_reconciler.cpp` 的 `applyProps` / `applyLabelProps` 与 `kLabel` 属性表.
+- 固定宽度必须用 Flex 容器: `ui.row({ width = N, justify = "center", align = "center" }, { ui.label({...}) })`. 容器 `width` 会同时设置 min/max width (`ui_tree_reconciler.cpp:1740`).
+- label 侧用 `maxWidth = N`, `maxLines = 1`, `textAlign = "center"` 约束文本.
+
+### 9.2 点击动作优先用 `[widget.actions]`
+
+- 在 `[[widget]]` 内声明默认动作 (API 14), 会显示在 widget 设置面板的 Actions 中, 用户可按实例覆盖:
+
+  ```toml
+  [widget.actions]
+  left = "panel-toggle forty/modifier-keys:panel"
+  right = "settings-open-widget"
+  middle = "settings-open-widget"
+  ```
+
+- 动作语法: `<noctalia msg 命令>` / `exec <shell command>` / `none`.
+- 声明某个手势后, 脚本的 `onClick` / `onRightClick` 对该手势不再触发.
+- `settings-open-widget` 打开该 widget 的设置弹窗; `settings-open-plugin <id>` 打开插件设置页.
+
+### 9.3 垂直 bar 的方向时序
+
+- 脚本顶层可能在宿主完成 bar 布局前执行, 此时 `barWidget.isVertical()` 可能仍是水平默认值. 之后如果没有状态变化, 不会重新渲染, 于是垂直栏显示成水平.
+- 复现: `noctalia msg plugins disable/enable forty/modifier-keys` 重建插件.
+- 修复: 定义 `update()`, 比较 `barWidget.isVertical()` 与上次渲染方向, 不一致就重绘. 默认 update 间隔 250 ms, 重启后能自愈.
+
+  ```lua
+  local lastVertical = nil
+  local function render()
+    lastVertical = barWidget.isVertical()
+    -- build tree
+  end
+  function update()
+    if lastVertical == nil or barWidget.isVertical() ~= lastVertical then
+      render()
+    end
+  end
+  ```
+
+### 9.4 显示设置与边缘裁剪
+
+- 颜色: `type = "color"` 的设置会渲染成主题角色下拉 (`primary` / `secondary` / ...) 加自定义颜色, 默认值可写角色 token; 不要用 `string` 让用户手填颜色.
+- 字体: `type = "string"` 存系统字体族名, 直接传给 `ui.label.fontFamily`; 空字符串表示继承 bar 字体. 社区 `lyrics` 插件也是这种用法.
+- 宽字形会在固定槽内居中并向两侧溢出. 在根容器加对称缓冲: 水平 bar 用 `paddingH`, 垂直 bar 用 `paddingV`, 否则首尾字形会被胶囊边缘或 bar slot 裁剪.
+- 槽宽过小时 label 会 elide (显示 `…`), 需按字体与 DPI 调整 `symbol_width`.
+
+### 9.5 本文专项章节的适用性
+
+- 4.5/4.6 的 manifest/骨架是迁移前建议. 最终实现中: `plugin_api = 22`, widget id `bar`, service id `input`, panel `placement = "attached"`, 设置在 plugin/widget 两个 scope, 键名与示例不同.
+- 最终实现见 `modifier-keys/plugin.toml`, `bar.luau`, `input.luau`, `panel.luau`, `stats.luau`, `keymap.luau`.
+- 2.4 / 5.3 中的配置行号、bar 实例名会随用户配置变化, 以 `~/.local/state/noctalia/settings.toml` 实际内容为准.
+
+### 9.6 已解决的不确定项
+
+- 第 6 节第 1-3 条: path source 启用、插件加载、`runStream` 接 `libinput debug-events` 均已实测通过. `runStream` 没有退出回调, 用 shell 监督循环 `while true; do <cmd>; sleep 1; done`.
+- 第 6 节第 4 条: v4 SQLite 统计不迁移; v5 改为 `pluginDataDir()/stats.json` 的每日聚合.
+- 第 6 节第 5 条: 旧设置不迁移, 需在新设置页重填.
+- 第 6 节第 6 条: 最终取 `plugin_api = 22`, 覆盖 `require` 模块用法.
+- 第 6 节第 7 条: 最终只用 `primary` / `on_surface` / `on_surface_variant` / `surface` / `error`, 不需要 API 43.
+- 第 6 节第 9 条: v4 环境不可用, 迁移验证全部在 v5 完成.
+- 第 6 节第 10 条: 有效文档路径是版本化路径 `https://docs.noctalia.dev/noctalia/v5.5.0/plugins/...`.
+
+### 9.7 其他插件的通用迁移步骤
+
+1. 新建 `plugin.toml`: `id = "author/plugin"`, `plugin_api` 取实际用到的最低 API 级别.
+2. 按能力选择 entry: `[[widget]]` / `[[panel]]` / `[[service]]` / `[[shortcut]]` / `[[desktop_widget]]` / `[[layer]]`.
+3. QML UI 改为 `ui.*` 声明式树; 固定尺寸用 Flex 容器, 不要依赖 label 的 `width`.
+4. `pluginApi.*` 改为 `noctalia.*`; 设置改为 `[[setting]]` schema; 颜色用 `color` 类型, 字体用 `string`.
+5. 长驻进程用 `runStream`, 一次性命令用 `runAsync`; `LocalStorage` 改为 `pluginDataDir()` + JSON; 跨 entry 通信用 `noctalia.state`.
+6. i18n 放 `translations/en.json` 与 `translations/zh-Hans.json`; JSON 嵌套会被展平成点路径 key.
+7. 左/右/中键默认行为写 `[widget.actions]`, 让它出现在 widget 设置中.
+8. 本地验证: `noctalia plugins lint <dir>`, 再用 `plugins disable/enable` 测试重建路径与横竖布局.
+9. 发布: 仓库根 `catalog.toml`, `thumbnail.webp` (960x540), `README.md`, `translations/en.json`.
