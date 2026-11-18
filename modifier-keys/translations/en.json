@@ -1,0 +1,92 @@
+{
+  "title": "Modifier Keys",
+  "super": "Super (Win)",
+  "alt": "Alt",
+  "ctrl": "Ctrl",
+  "shift": "Shift",
+  "gestures": "Gestures",
+  "motion": "Motion",
+  "click": "Click",
+  "scroll": "Scroll",
+  "swipe3": "3-Finger Swipe",
+  "swipe4": "4-Finger Swipe",
+  "pinch": "Pinch",
+  "help": "Help",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "errors": {
+    "capture_failed": "Unable to start input capture: {command}"
+  },
+  "settings": {
+    "capture_command": {
+      "label": "Input capture command",
+      "description": "Shell command whose output is parsed for keyboard and touchpad events. Change it only if libinput needs different arguments."
+    },
+    "spacing": {
+      "label": "Symbol spacing",
+      "description": "Gap between the modifier and key symbols, in pixels."
+    },
+    "width": {
+      "label": "Symbol slot width",
+      "description": "Fixed width of each symbol slot, in pixels. A fixed slot keeps the widget from resizing as different keys are pressed. Increase it if wide glyphs get clipped."
+    },
+    "font": {
+      "label": "Symbol font family",
+      "description": "Font family used for the symbols. Leave empty to use the bar's font. The family must be installed on the system."
+    },
+    "active_color": {
+      "label": "Highlight color",
+      "description": "Color used while a modifier key or key press is highlighted."
+    },
+    "inactive_color": {
+      "label": "Idle color",
+      "description": "Color used for symbols that are not currently highlighted."
+    },
+    "modifier": {
+      "label": "Modifier Key Symbols",
+      "desc": "Customize modifier key display symbols (JSON, e.g. {\"super\":\"⌘\"}). Key names are case-insensitive.",
+      "json": "JSON",
+      "reset": "Reset",
+      "copy": "Copy",
+      "useDefault": "Use Defaults"
+    },
+    "gesture": {
+      "label": "Gesture Symbols",
+      "desc": "Customize gesture display symbols (JSON format)",
+      "json": "JSON",
+      "reset": "Reset",
+      "copy": "Copy",
+      "useDefault": "Use Defaults"
+    },
+    "fade": {
+      "label": "Highlight hold time (ms)",
+      "description": "How long pressed modifier keys and gestures stay highlighted after release."
+    },
+    "retention": {
+      "label": "Statistics retention (days)",
+      "description": "Daily key statistics older than this are deleted."
+    },
+    "show_gesture": {
+      "label": "Show gestures",
+      "description": "Show trackpad gestures and pointer motion in the bar."
+    },
+    "modifierKeys": "Modifier Keys",
+    "gestureKeys": "Gesture Keys"
+  },
+  "stats": {
+    "title": "Statistics",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "allTime": "All Time",
+    "totalKeypresses": "Total Keypresses",
+    "mostUsedKey": "Most Used Key",
+    "mostUsedShortcut": "Most Used Shortcut",
+    "topKeys": "Top 20 Keys",
+    "topShortcuts": "Top 20 Shortcuts",
+    "clearStats": "Clear Statistics",
+    "clearConfirm": "Are you sure you want to clear all statistics? This cannot be undone.",
+    "noData": "No Data"
+  }
+}

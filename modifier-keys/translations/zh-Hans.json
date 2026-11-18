@@ -1,0 +1,92 @@
+{
+  "title": "修饰键",
+  "super": "Super (Win 键)",
+  "alt": "Alt",
+  "ctrl": "Ctrl",
+  "shift": "Shift",
+  "gestures": "手势",
+  "motion": "移动",
+  "click": "点击",
+  "scroll": "滚动",
+  "swipe3": "三指滑动",
+  "swipe4": "四指滑动",
+  "pinch": "缩放",
+  "help": "帮助",
+  "cancel": "取消",
+  "confirm": "确认",
+  "errors": {
+    "capture_failed": "无法启动输入捕获：{command}"
+  },
+  "settings": {
+    "capture_command": {
+      "label": "输入捕获命令",
+      "description": "读取键盘与触摸板事件的 shell 命令。仅在 libinput 需要额外参数时修改。"
+    },
+    "spacing": {
+      "label": "符号间距",
+      "description": "修饰键与按键符号之间的像素间距。"
+    },
+    "width": {
+      "label": "符号槽宽度",
+      "description": "每个符号槽位的固定像素宽度。固定槽宽可避免不同按键切换时小组件宽度抖动；若宽字形被裁剪可调大该值。"
+    },
+    "font": {
+      "label": "符号字体",
+      "description": "显示符号使用的字体族；留空则继承状态栏字体。需为系统已安装字体。"
+    },
+    "active_color": {
+      "label": "高亮颜色",
+      "description": "修饰键按下或按键高亮时使用的颜色。"
+    },
+    "inactive_color": {
+      "label": "未高亮颜色",
+      "description": "未处于高亮状态的符号颜色。"
+    },
+    "modifier": {
+      "label": "修饰键符号",
+      "desc": "自定义修饰键显示符号（JSON，如 {\"super\":\"⌘\"}）。键名不区分大小写。",
+      "json": "JSON",
+      "reset": "重置",
+      "copy": "复制",
+      "useDefault": "使用默认"
+    },
+    "gesture": {
+      "label": "手势符号",
+      "desc": "自定义手势显示符号（JSON 格式）",
+      "json": "JSON",
+      "reset": "重置",
+      "copy": "复制",
+      "useDefault": "使用默认"
+    },
+    "fade": {
+      "label": "高亮保持时长（毫秒）",
+      "description": "按下过的修饰键或手势在松开后保持高亮的时间。"
+    },
+    "retention": {
+      "label": "统计保留天数",
+      "description": "超过该天数的按日按键统计会被删除。"
+    },
+    "show_gesture": {
+      "label": "显示手势",
+      "description": "在状态栏显示触摸板手势与指针移动。"
+    },
+    "modifierKeys": "修饰键",
+    "gestureKeys": "手势键"
+  },
+  "stats": {
+    "title": "统计",
+    "today": "今天",
+    "yesterday": "昨天",
+    "thisWeek": "本周",
+    "thisMonth": "本月",
+    "allTime": "全部",
+    "totalKeypresses": "总按键次数",
+    "mostUsedKey": "最常用按键",
+    "mostUsedShortcut": "最常用组合",
+    "topKeys": "最常用按键 TOP 20",
+    "topShortcuts": "快捷键组合 TOP 20",
+    "clearStats": "清空统计数据",
+    "clearConfirm": "确定要清空所有统计数据吗？此操作不可恢复。",
+    "noData": "暂无数据"
+  }
+}

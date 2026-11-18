@@ -1,0 +1,136 @@
+# Modifier Keys - Noctalia v5 plugin.
+#
+# Displays the live state of the Super / Alt / Ctrl / Shift modifier keys,
+# the last key pressed, and trackpad gestures in the bar.
+# Keyboard and touchpad events come from `libinput debug-events`, read by the
+# `input` service through noctalia.runStream and published to the bar and
+# panel entries over noctalia.state.
+#
+# The v4 QML implementation (manifest.json, BarWidget.qml, Panel.qml,
+# Settings.qml, KeyStats.js) is kept in this directory for the legacy shell;
+# Noctalia v5 only reads this file and the .luau entries.
+
+id = "forty/modifier-keys"
+name = "Modifier Keys"
+version = "2.0.0"
+plugin_api = 22
+author = "forty"
+license = "MIT"
+icon = "keyboard"
+description = "Display keyboard modifier keys status and trackpad gestures in the status bar."
+tags = ["bar", "indicator", "system"]
+dependencies = ["libinput"]
+
+# ── Plugin-level settings (shared by service, bar and panel) ──────────────
+
+[[setting]]
+key = "capture_command"
+type = "string"
+label_key = "settings.capture_command.label"
+description_key = "settings.capture_command.description"
+default = "libinput debug-events --show-keycodes"
+
+[[setting]]
+key = "modifier_symbols"
+type = "string"
+label_key = "settings.modifier.label"
+description_key = "settings.modifier.desc"
+default = ""
+
+[[setting]]
+key = "gesture_symbols"
+type = "string"
+label_key = "settings.gesture.label"
+description_key = "settings.gesture.desc"
+default = ""
+
+[[setting]]
+key = "fade_ms"
+type = "int"
+label_key = "settings.fade.label"
+description_key = "settings.fade.description"
+default = 800
+min = 0
+max = 5000
+step = 50
+
+[[setting]]
+key = "stats_retention_days"
+type = "int"
+label_key = "settings.retention.label"
+description_key = "settings.retention.description"
+default = 90
+min = 1
+max = 3650
+
+# ── Entries ───────────────────────────────────────────────────────────────
+
+[[widget]]
+id = "bar"
+entry = "bar.luau"
+
+  [[widget.setting]]
+  key = "symbol_spacing"
+  type = "int"
+  label_key = "settings.spacing.label"
+  description_key = "settings.spacing.description"
+  default = 2
+  min = 0
+  max = 24
+
+  [[widget.setting]]
+  key = "symbol_width"
+  type = "int"
+  label_key = "settings.width.label"
+  description_key = "settings.width.description"
+  default = 16
+  min = 8
+  max = 64
+
+  [[widget.setting]]
+  key = "font_family"
+  type = "string"
+  label_key = "settings.font.label"
+  description_key = "settings.font.description"
+  default = ""
+
+  [[widget.setting]]
+  key = "active_color"
+  type = "color"
+  label_key = "settings.active_color.label"
+  description_key = "settings.active_color.description"
+  default = "primary"
+
+  [[widget.setting]]
+  key = "inactive_color"
+  type = "color"
+  label_key = "settings.inactive_color.label"
+  description_key = "settings.inactive_color.description"
+  default = "on_surface_variant"
+
+  [[widget.setting]]
+  key = "show_gesture"
+  type = "bool"
+  label_key = "settings.show_gesture.label"
+  description_key = "settings.show_gesture.description"
+  default = true
+
+  # Default pointer actions, editable per widget under Actions in the widget's
+  # settings popup (middle click). A binding replaces onClick/onRightClick.
+  [widget.actions]
+  left = "panel-toggle forty/modifier-keys:panel"
+  right = "settings-open-widget"
+  middle = "settings-open-widget"
+
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 640
+height = 500
+placement = "attached"
+position = "auto"
+open_near_click = true
+
+[[service]]
+id = "input"
+entry = "input.luau"
